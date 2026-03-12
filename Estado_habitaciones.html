@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Control de Habitaciones e Inventario - Sistema Hotelero</title>
+<link rel="stylesheet" href="estilos_limpieza.css">
+</head>
+
+<body>
+
+<header>
+<h1>Sistema de Gestión Hotelera</h1>
+<p>Módulo de Limpieza</p>
+</header>
+
+<nav>
+<a href="#">Control de Habitaciones</a>
+<a href="#">Asignación de Limpieza</a>
+<a href="#">Registro de Limpieza</a>
+</nav>
+
+<div class="container">
+
+<h2>Control de Habitaciones</h2>
+
+<table id="tablaHabitaciones">
+<tr>
+<th>Habitación</th>
+<th>Tipo</th>
+<th>Piso</th>
+<th>Estado</th>
+<th>Cambiar Estado</th>
+</tr>
+
+<!-- 5 Simples -->
+<tr><td>101</td><td>Simple</td><td>1</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>102</td><td>Simple</td><td>1</td><td class="sucia">Sucia</td><td>
+<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>103</td><td>Simple</td><td>1</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>104</td><td>Simple</td><td>1</td><td class="limpieza">En limpieza</td><td>
+<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>105</td><td>Simple</td><td>1</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+
+<!-- 5 Normales -->
+<tr><td>201</td><td>Normal</td><td>2</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>202</td><td>Normal</td><td>2</td><td class="sucia">Sucia</td><td>
+<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>203</td><td>Normal</td><td>2</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>204</td><td>Normal</td><td>2</td><td class="limpieza">En limpieza</td><td>
+<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>205</td><td>Normal</td><td>2</td><td class="mantenimiento">Mantenimiento</td><td>
+<select><option>Limpia</option><option>Sucia</option><option>En limpieza</option><option selected>Mantenimiento</option></select></td></tr>
+
+<!-- 5 Familiares -->
+<tr><td>301</td><td>Familiar</td><td>1</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>302</td><td>Familiar</td><td>2</td><td class="sucia">Sucia</td><td>
+<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>303</td><td>Familiar</td><td>3</td><td class="limpieza">En limpieza</td><td>
+<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>304</td><td>Familiar</td><td>4</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>305</td><td>Familiar</td><td>3</td><td class="mantenimiento">Mantenimiento</td><td>
+<select><option>Limpia</option><option>Sucia</option><option>En limpieza</option><option selected>Mantenimiento</option></select></td></tr>
+
+<!-- 5 Lujosas -->
+<tr><td>401</td><td>Lujosa</td><td>4</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>402</td><td>Lujosa</td><td>5</td><td class="sucia">Sucia</td><td>
+<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>403</td><td>Lujosa</td><td>6</td><td class="limpia">Limpia</td><td>
+<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>404</td><td>Lujosa</td><td>6</td><td class="limpieza">En limpieza</td><td>
+<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
+<tr><td>405</td><td>Lujosa</td><td>6</td><td class="mantenimiento">Mantenimiento</td><td>
+<select><option>Limpia</option><option>Sucia</option><option>En limpieza</option><option selected>Mantenimiento</option></select></td></tr>
+
+</table>
+
+<br>
+<button onclick="actualizarEstados()">Actualizar Estados</button>
+
+<!-- ===================== CONTROL DE INVENTARIO ===================== -->
+<div class="container">
+
+<h2>Control de Inventario de Limpieza</h2>
+
+<table id="tablaInventario">
+<tr>
+<th>Producto</th>
+<th>Cantidad Disponible</th>
+<th>Actualizar Cantidad</th>
+</tr>
+
+<tr>
+<td>Jabón</td>
+<td class="cantidad">50</td>
+<td><input type="number" value="50" min="0"></td>
+</tr>
+
+<tr>
+<td>Toallas</td>
+<td class="cantidad">30</td>
+<td><input type="number" value="30" min="0"></td>
+</tr>
+
+<tr>
+<td>Detergente</td>
+<td class="cantidad">20</td>
+<td><input type="number" value="20" min="0"></td>
+</tr>
+
+<tr>
+<td>Guantes</td>
+<td class="cantidad">100</td>
+<td><input type="number" value="100" min="0"></td>
+</tr>
+
+<tr>
+<td>Desinfectante</td>
+<td class="cantidad">15</td>
+<td><input type="number" value="15" min="0"></td>
+</tr>
+
+</table>
+
+<br>
+<button onclick="actualizarInventario()">Actualizar Inventario</button>
+
+</div>
+<!-- ===================== FIN CONTROL DE INVENTARIO ===================== -->
+
+<footer>
+Sistema Hotelero - Módulo de Limpieza
+</footer>
+
+<script>
+function actualizarEstados(){
+    const tabla = document.getElementById("tablaHabitaciones");
+    const filas = tabla.getElementsByTagName("tr");
+
+    for(let i=1; i<filas.length; i++){
+        const fila = filas[i];
+        const select = fila.getElementsByTagName("select")[0];
+        const estadoCelda = fila.getElementsByTagName("td")[3];
+
+        estadoCelda.textContent = select.value;
+        fila.className = ""; // limpia toda la fila
+        if(select.value === "Limpia") fila.classList.add("fila-limpia");
+        else if(select.value === "Sucia") fila.classList.add("fila-sucia");
+        else if(select.value === "En limpieza") fila.classList.add("fila-limpieza");
+        else if(select.value === "Mantenimiento") fila.classList.add("fila-mantenimiento");
+    }
+}
+
+function actualizarInventario(){
+    const tabla = document.getElementById("tablaInventario");
+    const filas = tabla.getElementsByTagName("tr");
+
+    for(let i=1; i<filas.length; i++){
+        const fila = filas[i];
+        const input = fila.getElementsByTagName("input")[0];
+        const cantidadCelda = fila.getElementsByClassName("cantidad")[0];
+        cantidadCelda.textContent = input.value;
+
+        fila.className = ""; // cambia color según cantidad
+        if(parseInt(input.value) <= 5) fila.classList.add("bajo-stock");
+        else if(parseInt(input.value) <= 15) fila.classList.add("medio-stock");
+        else fila.classList.add("alto-stock");
+    }
+}
+</script>
+
+</body>
+</html>
