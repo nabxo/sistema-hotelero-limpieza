@@ -195,7 +195,6 @@ Sistema Hotelero - Módulo de Limpieza
 <!--  ===================== FIN SECCIÓN HISTORIAL  ===================== -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
 function actualizarEstados(){
     const tabla = document.getElementById("tablaHabitaciones");
@@ -253,9 +252,9 @@ function guardarLocal(){
 
 /// Mostrar secciones
 function mostrar(seccion) {
-   $("#estado, #registro, #historial, #inventario").hide();
-   $("#" + seccion).show();
-   if(seccion === "historial"){ 
+   $("#registro, #historial").hide();
+   if(seccion === "registro"){
+    $("#registro, #historial").show();
     cargarHistorial(); 
   }
 }
