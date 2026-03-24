@@ -157,7 +157,7 @@ Sistema Hotelero - Módulo de Limpieza
       </div>
       <div class="form-group">
        <label for="estado">Estado</label>
-        <select class="form-control" id="etapa" required>
+        <select class="form-control" id="estado" required>
          <option value="">Seleccione un estado</option>
          <option value="Completado">Completado</option>
          <option value="Pendiente">Pendiente</option>
@@ -252,10 +252,16 @@ function guardarLocal(){
 
 /// Mostrar secciones
 function mostrar(seccion) {
-   $("#registro, #historial").hide();
-   if(seccion === "registro"){
+  $("#tablaHabitaciones, #tablaInventario, #tablaAsignacion, #registro, #historial").hide();
+
+  if(seccion === "registro"){
     $("#registro, #historial").show();
-    cargarHistorial(); 
+    cargarHistorial();
+  } else if(seccion === "historial"){
+    $("#historial").show();
+    cargarHistorial();
+  } else {
+    $("#" + seccion).show();
   }
 }
 
@@ -296,14 +302,6 @@ function cargarHistorial(pagina = 1, porPagina = 5){
       </tr>
     `);
   });
-
-  if(fin < filtrados.length){
-    $("#cargarMas").show().off("click").on("click", function(){
-      cargarHistorial(pagina+1, porPagina);
-    });
-  } else {
-    $("#cargarMas").hide();
-  }
 }
 
 // Borrar registro del historial
@@ -312,14 +310,6 @@ $(document).on("click", ".borrar", function(){
   registros.splice(index, 1);        
   guardarLocal();                    
   cargarHistorial();                
-});
-
-// Eventos de filtros con animación
-$("#buscador, #filtroEstado").on("input change", function(){
-  $("#tablaHistorial tbody").fadeOut(200, function(){
-    cargarHistorial();
-    $(this).fadeIn(200);
-  });
 });
 
 // Capturar envío del formulario con validación y guardado
