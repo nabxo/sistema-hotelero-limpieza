@@ -14,12 +14,12 @@
 </header>
 
 <nav>
-<a onclick="mostrar('tablaHabitaciones', 'tablaInventario')">Control de Habitaciones</a>
+<a onclick="mostrar('habitaciones', 'inventario')">Control de Habitaciones</a>
 <a onclick="mostrar('tablaAsignacion')">Asignación de Limpieza</a>
 <a onclick="mostrar('registro', 'historial')">Registro de Limpieza</a>
 </nav>
 
-<div class="container">
+<section id="habitaciones" class="container mt-5">
 
 <h2>Estado actual de las habitaciones</h2>
 
@@ -84,11 +84,12 @@
 
 <br>
 <button onclick="actualizarEstados()">Actualizar Estados</button>
+</section>
 
 <!-- ===================== CONTROL DE INVENTARIO ===================== -->
-<div class="container">
+ <section id="inventario" class="container mt-5" style="display:none;">
 
-<h2>Control de Inventario de Limpieza</h2>
+  <h2>Control de Inventario de Limpieza</h2>
 
 <table id="tablaInventario">
 <tr>
@@ -128,13 +129,13 @@
 <br>
 <button onclick="actualizarInventario()">Actualizar Inventario</button>
 
-</div>
+
 <!-- ===================== FIN CONTROL DE INVENTARIO ===================== -->
 
 <footer>
 Sistema Hotelero - Módulo de Limpieza
 </footer>
-
+</section>
  <!--  ===================== SECCIÓN REGISTRO  ===================== -->
   <section id="registro" class="container mt-5" style="display:none;">
     <h2 class="text-center mb-4">Registro de Limpieza</h2>
@@ -252,13 +253,13 @@ function guardarLocal(){
 
 /// Mostrar secciones
 function mostrar(seccion) {
-  $("#tablaHabitaciones, #tablaInventario, #tablaAsignacion, #registro, #historial").hide();
+  $("#habitaciones, #inventario, #tablaAsignacion, #registro, #historial").hide();
 
   if(seccion === "registro"){
     $("#registro, #historial").show();
     cargarHistorial();
-  } else if(seccion === "historial"){
-    $("#historial").show();
+  } else if(seccion === "habitaciones"){
+    $("#habitaciones, #inventario").show();
     cargarHistorial();
   } else {
     $("#" + seccion).show();
@@ -351,7 +352,7 @@ $("#formRegistro").on("submit", function(e){
   registros.unshift(nuevoRegistro);
   guardarLocal();
   $("#formRegistro")[0].reset();
-  mostrar("historial");
+  mostrar("registro");
 
   // Notificación visual
   $("#tablaHistorial").before(`<div class="alert alert-info text-center">
