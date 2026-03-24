@@ -84,3 +84,129 @@ padding:20px;
 color:#777;
 font-size:14px;
 }
+
+/* ===== Estilos para el formulario de Registro de Limpieza ===== */
+#registro {
+  max-width: 700px;
+  margin: 40px auto;
+}
+
+#formRegistro {
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#formRegistro label {
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 6px;
+  display: block;
+}
+
+#formRegistro input,
+#formRegistro select,
+#formRegistro textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+#formRegistro input:focus,
+#formRegistro select:focus,
+#formRegistro textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 5px rgba(52,152,219,0.3);
+}
+
+#formRegistro textarea {
+  resize: vertical;
+}
+
+#registro h2 {
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+#registro .btn-success {
+  font-size: 16px;
+  padding: 12px;
+  border-radius: 6px;
+  width: 100%;
+  background: #28a745;
+  border: none;
+  transition: background 0.3s;
+}
+
+#registro .btn-success:hover {
+  background: #218838;
+}
+
+/* ===== Estilos para la tabla de Historial de Limpieza ===== */
+#historial {
+  max-width: 900px;
+  margin: 40px auto;
+}
+
+#tablaHistorial {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#tablaHistorial th {
+  background: #2c3e50;
+  color: #fff;
+  padding: 14px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#tablaHistorial td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+#tablaHistorial tr:hover {
+  background: #f9f9f9;
+}
+
+/* Estados con colores tipo badge */
+.badge {
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.badge-success { background: #28a745; }   
+.badge-warning { background: #ffc107; }   
+.badge-danger  { background: #dc3545; }   
+
+/* Botón de acción (borrar) */
+#tablaHistorial .btn-danger {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  background: #dc3545;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.3s;
+}
+
+#tablaHistorial .btn-danger:hover {
+  background: #c82333;
+}
