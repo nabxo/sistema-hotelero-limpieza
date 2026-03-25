@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Limpieza - Sistema Hotelero</title>
+    <link rel="stylesheet" href="estilos_limpieza.css">
+    <style>
+        .barra-controles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .barra-controles input,
+        .barra-controles select {
+            padding: 8px;
+        }
+
+        .mensaje {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .mensaje.exito {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .mensaje.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .acciones-btn {
+            padding: 5px 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .btn-editar {
+            background-color: orange;
+        }
+
+        .btn-eliminar {
+            background-color: red;
+        }
+
+        .btn-limpiar {
+            background-color: gray;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #1f4e79;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Sistema de Gestión Hotelera</h1>
+    <p>Módulo de Limpieza</p>
+</header>
+
+<nav>
+    <a href="index.html">Control de Habitaciones</a>
+    <a href="asignacion_limpieza.html">Asignación de Limpieza</a>
+    <a href="#">Registro de Limpieza</a>
+</nav>
+
+<div class="container">
+
+    <h2>Asignar Personal de Limpieza</h2>
+
+    <div id="mensaje" class="mensaje"></div>
+
+    <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 30px;">
+        <form id="formAsignacion">
+            <label for="habitacion" style="display: inline-block; width: 180px;">Habitación:</label>
+            <select id="habitacion" name="habitacion" style="padding: 5px; margin-bottom: 10px;">
+                <option value="">Seleccione una habitación</option>
+                <option value="101">101</option>
+                <option value="102">102</option>
+                <option value="103">103</option>
+                <option value="104">104</option>
+                <option value="105">105</option>
+                <option value="201">201</option>
+                <option value="202">202</option>
+                <option value="203">203</option>
+                <option value="204">204</option>
+                <option value="205">205</option>
+                <option value="301">301</option>
+                <option value="302">302</option>
+                <option value="303">303</option>
+                <option value="304">304</option>
+                <option value="305">305</option>
+                <option value="401">401</option>
+                <option value="402">402</option>
+                <option value="403">403</option>
+            </select>
+            <br>
+
+            <label for="empleado" style="display: inline-block; width: 180px;">Nombre del empleado:</label>
+            <input type="text" id="empleado" name="empleado" placeholder="Ej. Juan Pérez" style="padding: 5px; margin-bottom: 10px;">
+            <br>
+
+            <label for="fecha" style="display: inline-block; width: 180px;">Fecha de asignación:</label>
+            <input type="date" id="fecha" name="fecha" style="padding: 5px; margin-bottom: 10px;">
+            <br>
+
+            <label for="hora" style="display: inline-block; width: 180px;">Hora de asignación:</label>
+            <input type="time" id="hora" name="hora" style="padding: 5px; margin-bottom: 10px;">
+            <br>
+
+            <button type="submit" id="btnGuardar" style="background-color: #1f4e79; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px;">
+                Confirmar Asignación
+            </button>
+
+            <button type="button" class="btn-limpiar" onclick="limpiarFormulario()">
+                Limpiar
+            </button>
+        </form>
+    </div>
+
+    <h2>Tareas Asignadas Actualmente</h2>
+
+    <div class="barra-controles">
+        <input type="text" id="buscador" placeholder="Buscar por habitación, empleado o fecha">
+
+        <select id="ordenarPor">
+            <option value="ninguno">Ordenar por</option>
+            <option value="habitacion">Habitación</option>
+            <option value="fecha">Fecha</option>
+        </select>
+    </div>
+
+    <table id="tablaAsignaciones">
+        <thead>
+        <tr>
+            <th>Habitación</th>
+            <th>Empleado Responsable</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+</div>
+
+<footer>
+    Sistema Hotelero - Módulo de Limpieza
+</footer>
+
+<script>
+    let asignaciones = JSON.parse(localStorage.getItem("asignaciones")) || [];
+    let indiceEditando = -1;
+
+    function guardarAsignaciones() {
+        localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
+    }
+
+    function mostrarMensaje(texto, tipo) {
+        const mensaje = document.getElementById("mensaje");
+        mensaje.textContent = texto;
+        mensaje.className = "mensaje " + tipo;
+        mensaje.style.display = "block";
+
+        setTimeout(() => {
+            mensaje.style.display = "none";
+        }, 2500);
+    }
+
+    function eliminarAsignacion(indice) {
+        const confirmar = confirm("¿Seguro que deseas eliminar esta asignación?");
+        if (!confirmar) return;
+
+        asignaciones.splice(indice, 1);
+        guardarAsignaciones();
+        aplicarFiltrosYOrden();
+        mostrarMensaje("Asignación eliminada correctamente", "exito");
+    }
+
+    function editarAsignacion(indice) {
+        document.getElementById("habitacion").value = asignaciones[indice].habitacion;
+        document.getElementById("empleado").value = asignaciones[indice].empleado;
+        document.getElementById("fecha").value = asignaciones[indice].fecha;
+        document.getElementById("hora").value = asignaciones[indice].hora;
+
+        indiceEditando = indice;
+        document.getElementById("btnGuardar").textContent = "Guardar Cambios";
+        mostrarMensaje("Editando asignación seleccionada", "exito");
+    }
+
+    function limpiarFormulario() {
+        document.getElementById("formAsignacion").reset();
+        indiceEditando = -1;
+        document.getElementById("btnGuardar").textContent = "Confirmar Asignación";
+        mostrarMensaje("Formulario limpiado", "exito");
+    }
+
+    function validarNombre(nombre) {
+        const soloNumeros = /^[0-9]+$/;
+        return nombre.trim() !== "" && !soloNumeros.test(nombre.trim());
+    }
+
+    function existeAsignacionDuplicada(habitacion, fecha, indiceActual = -1) {
+        return asignaciones.some((a, index) => {
+            return a.habitacion === habitacion && a.fecha === fecha && index !== indiceActual;
+        });
+    }
+
+    document.getElementById("formAsignacion").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        let habitacion = document.getElementById("habitacion").value;
+        let empleado = document.getElementById("empleado").value;
+        let fecha = document.getElementById("fecha").value;
+        let hora = document.getElementById("hora").value;
+        let estado = "Pendiente";
+
+        if (habitacion === "" || empleado.trim() === "" || fecha === "" || hora === "") {
+            mostrarMensaje("Completa todos los campos", "error");
+            return;
+        }
+
+        if (!validarNombre(empleado)) {
+            mostrarMensaje("El nombre del empleado no puede estar vacío ni ser solo números", "error");
+            return;
+        }
+
+        if (existeAsignacionDuplicada(habitacion, fecha, indiceEditando)) {
+            mostrarMensaje("Ya existe una asignación para esa habitación en esa fecha", "error");
+            return;
+        }
+
+        let datosAsignacion = {
+            habitacion: habitacion,
+            empleado: empleado,
+            fecha: fecha,
+            hora: hora,
+            estado: estado
+        };
+
+        if (indiceEditando === -1) {
+            asignaciones.push(datosAsignacion);
+            mostrarMensaje("Asignación guardada correctamente", "exito");
+        } else {
+            asignaciones[indiceEditando] = datosAsignacion;
+            indiceEditando = -1;
+            document.getElementById("btnGuardar").textContent = "Confirmar Asignación";
+            mostrarMensaje("Asignación actualizada correctamente", "exito");
+        }
+
+        guardarAsignaciones();
+        aplicarFiltrosYOrden();
+        document.getElementById("formAsignacion").reset();
+    });
+
+    document.getElementById("buscador").addEventListener("input", aplicarFiltrosYOrden);
+    document.getElementById("ordenarPor").addEventListener("change", aplicarFiltrosYOrden);
+
+    function aplicarFiltrosYOrden() {
+        let texto = document.getElementById("buscador").value.toLowerCase();
+        let orden = document.getElementById("ordenarPor").value;
+
+        let listaFiltrada = asignaciones.filter(a =>
+            a.habitacion.toLowerCase().includes(texto) ||
+            a.empleado.toLowerCase().includes(texto) ||
+            a.fecha.toLowerCase().includes(texto)
+        );
+
+        if (orden === "habitacion") {
+            listaFiltrada.sort((a, b) => a.habitacion.localeCompare(b.habitacion));
+        } else if (orden === "fecha") {
+            listaFiltrada.sort((a, b) => a.fecha.localeCompare(b.fecha));
+        }
+
+        const listaConIndices = listaFiltrada.map(item => {
+            return {
+                ...item,
+                indiceOriginal: asignaciones.findIndex(a =>
+                    a.habitacion === item.habitacion &&
+                    a.empleado === item.empleado &&
+                    a.fecha === item.fecha &&
+                    a.hora === item.hora &&
+                    a.estado === item.estado
+                )
+            };
+        });
+
+        let tbody = document.querySelector("#tablaAsignaciones tbody");
+        tbody.innerHTML = "";
+
+        listaConIndices.forEach(function(asignacion) {
+            let fila = document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>${asignacion.habitacion}</td>
+                <td>${asignacion.empleado}</td>
+                <td>${asignacion.fecha}</td>
+                <td>${asignacion.hora}</td>
+                <td>${asignacion.estado}</td>
+                <td>
+                    <button class="acciones-btn btn-editar" onclick="editarAsignacion(${asignacion.indiceOriginal})">Editar</button>
+                    <button class="acciones-btn btn-eliminar" onclick="eliminarAsignacion(${asignacion.indiceOriginal})">Eliminar</button>
+                </td>
+            `;
+
+            tbody.appendChild(fila);
+        });
+    }
+
+    aplicarFiltrosYOrden();
+</script>
+
+</body>
+</html>
