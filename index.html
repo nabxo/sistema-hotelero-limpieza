@@ -17,7 +17,6 @@
 <a onclick="mostrar('habitaciones', 'inventario')">Control de Habitaciones</a>
 <a href="asignacion_limpieza.html">Asignación de Limpieza</a>
 <a onclick="mostrar('registro', 'historial')">Registro de Limpieza</a>
-
 </nav>
 
 <section id="habitaciones" class="container mt-5">
@@ -267,6 +266,12 @@ function mostrar(seccion) {
   }
 }
 
+window.onload = function() {
+  if(window.location.hash === "#registro") {
+    mostrar("registro");
+  }
+};
+
 // Cargar historial con filtros y paginación
 function cargarHistorial(pagina = 1, porPagina = 5){
   const tbody = $("#tablaHistorial tbody");
@@ -305,7 +310,7 @@ function cargarHistorial(pagina = 1, porPagina = 5){
     `);
   });
 }
-
+ 
 // Borrar registro del historial
 $(document).on("click", ".borrar", function(){
   const index = $(this).data("index");
