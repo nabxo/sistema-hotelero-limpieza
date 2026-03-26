@@ -246,9 +246,9 @@ let registros = JSON.parse(localStorage.getItem("registros")) || [
 function guardarLocal(){
   localStorage.setItem("registros", JSON.stringify(registros));
   $("#alertaGuardado").remove(); 
-  $("body").prepend(`<div id="alertaGuardado" class="alert alert-success text-center">
-    ✅ Registro guardado en el navegador
-  </div>`);
+ $("#formRegistro").before(`<div id="alertaGuardado" class="alert alert-success text-center">
+  ✅ Registro guardado en el navegador
+</div>`);
   setTimeout(()=>$("#alertaGuardado").fadeOut(),3000);
 }
 
