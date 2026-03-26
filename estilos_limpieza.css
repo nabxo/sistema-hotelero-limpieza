@@ -210,3 +210,13 @@ font-size:14px;
 #tablaHistorial .btn-danger:hover {
   background: #c82333;
 }
+
+/* Guardado confirmación */
+#alertaGuardado {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: auto;
+}
