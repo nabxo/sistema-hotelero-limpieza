@@ -2,8 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Control de Habitaciones e Inventario- Sistema Hotelero</title>
+<title>Control de Habitaciones e Inventario - Sistema Hotelero</title>
 <link rel="stylesheet" href="estilos_limpieza.css">
+<style>
+  .campo-solo-lectura {
+    background-color: #f2f2f2;
+  }
+</style>
 </head>
 
 <body>
@@ -14,16 +19,16 @@
 </header>
 
 <nav>
-<a onclick="mostrar('habitaciones', 'inventario')">Control de Habitaciones</a>
+<a href="#" onclick="mostrar('habitaciones')">Control de Habitaciones</a>
 <a href="asignacion_limpieza.html">Asignación de Limpieza</a>
-<a onclick="mostrar('registro', 'historial')">Registro de Limpieza</a>
+<a href="#" onclick="mostrar('registro')">Registro de Limpieza</a>
 </nav>
 
 <section id="habitaciones" class="container mt-5">
-
 <h2>Estado actual de las habitaciones</h2>
 
 <table id="tablaHabitaciones">
+<thead>
 <tr>
 <th>Habitación</th>
 <th>Tipo</th>
@@ -31,347 +36,526 @@
 <th>Estado</th>
 <th>Cambiar Estado</th>
 </tr>
-
-<!-- 5 Simples -->
-<tr><td>101</td><td>Simple</td><td>1</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>102</td><td>Simple</td><td>1</td><td class="sucia">Sucia</td><td>
-<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>103</td><td>Simple</td><td>1</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>104</td><td>Simple</td><td>1</td><td class="limpieza">En limpieza</td><td>
-<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>105</td><td>Simple</td><td>1</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-
-<!-- 5 Normales -->
-<tr><td>201</td><td>Normal</td><td>2</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>202</td><td>Normal</td><td>2</td><td class="sucia">Sucia</td><td>
-<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>203</td><td>Normal</td><td>2</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>204</td><td>Normal</td><td>2</td><td class="limpieza">En limpieza</td><td>
-<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>205</td><td>Normal</td><td>2</td><td class="mantenimiento">Mantenimiento</td><td>
-<select><option>Limpia</option><option>Sucia</option><option>En limpieza</option><option selected>Mantenimiento</option></select></td></tr>
-
-<!-- 5 Familiares -->
-<tr><td>301</td><td>Familiar</td><td>1</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>302</td><td>Familiar</td><td>2</td><td class="sucia">Sucia</td><td>
-<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>303</td><td>Familiar</td><td>3</td><td class="limpieza">En limpieza</td><td>
-<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>304</td><td>Familiar</td><td>4</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>305</td><td>Familiar</td><td>3</td><td class="mantenimiento">Mantenimiento</td><td>
-<select><option>Limpia</option><option>Sucia</option><option>En limpieza</option><option selected>Mantenimiento</option></select></td></tr>
-
-<!-- 5 Lujosas -->
-<tr><td>401</td><td>Lujosa</td><td>4</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>402</td><td>Lujosa</td><td>5</td><td class="sucia">Sucia</td><td>
-<select><option>Limpia</option><option selected>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>403</td><td>Lujosa</td><td>6</td><td class="limpia">Limpia</td><td>
-<select><option selected>Limpia</option><option>Sucia</option><option>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>404</td><td>Lujosa</td><td>6</td><td class="limpieza">En limpieza</td><td>
-<select><option>Limpia</option><option>Sucia</option><option selected>En limpieza</option><option>Mantenimiento</option></select></td></tr>
-<tr><td>405</td><td>Lujosa</td><td>6</td><td class="mantenimiento">Mantenimiento</td><td>
-<select><option>Limpia</option><option>Sucia</option><option>En limpieza</option><option selected>Mantenimiento</option></select></td></tr>
-
+</thead>
+<tbody></tbody>
 </table>
 
 <br>
 <button onclick="actualizarEstados()">Actualizar Estados</button>
 </section>
 
-<!-- ===================== CONTROL DE INVENTARIO ===================== -->
- <section id="inventario" class="container mt-5" style="display:none;">
-
-  <h2>Control de Inventario de Limpieza</h2>
+<section id="inventario" class="container mt-5" style="display:none;">
+<h2>Control de Inventario de Limpieza</h2>
 
 <table id="tablaInventario">
+<thead>
 <tr>
 <th>Producto</th>
 <th>Cantidad Disponible</th>
 <th>Actualizar Cantidad</th>
 </tr>
-
-<tr>
-<td>Jabón</td>
-<td class="cantidad">50</td>
-<td><input type="number" value="50" min="0"></td>
-</tr>
-<tr>
-<td>Toallas</td>
-<td class="cantidad">30</td>
-<td><input type="number" value="30" min="0"></td>
-</tr>
-<tr>
-<td>Detergente</td>
-<td class="cantidad">20</td>
-<td><input type="number" value="20" min="0"></td>
-</tr>
-<tr>
-<td>Guantes</td>
-<td class="cantidad">100</td>
-<td><input type="number" value="100" min="0"></td>
-</tr>
-<tr>
-<td>Desinfectante</td>
-<td class="cantidad">15</td>
-<td><input type="number" value="15" min="0"></td>
-</tr>
-
+</thead>
+<tbody></tbody>
 </table>
 
 <br>
 <button onclick="actualizarInventario()">Actualizar Inventario</button>
 
-
-<!-- ===================== FIN CONTROL DE INVENTARIO ===================== -->
-
 <footer>
 Sistema Hotelero - Módulo de Limpieza
 </footer>
 </section>
- <!--  ===================== SECCIÓN REGISTRO  ===================== -->
-  <section id="registro" class="container mt-5" style="display:none;">
-    <h2 class="text-center mb-4">Registro de Limpieza</h2>
-    <form id="formRegistro" class="border p-3">
-      <div class="form-group">
-        <label for="habitacion">Número de habitación</label>
-        <input type="text" class="form-control" id="habitacion" required>
-      </div>
-      <div class="form-group">
-        <label for="empleado">Nombre del empleado</label>
-        <input type="text" class="form-control" id="empleado" required>
-      </div>
-      <div class="form-group">
-        <label for="fecha">Fecha</label>
-        <input type="date" class="form-control" id="fecha" required>
-      </div>
-      <div class="form-group">
-        <label for="hora">Hora</label>
-        <input type="time" class="form-control" id="hora" required>
-      </div>
-      <div class="form-group">
-       <label for="estado">Estado</label>
-        <select class="form-control" id="estado" required>
-         <option value="">Seleccione un estado</option>
-         <option value="Completado">Completado</option>
-         <option value="Pendiente">Pendiente</option>
-         <option value="Cancelado">Cancelado</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="observaciones">Observaciones</label>
-        <textarea class="form-control" id="observaciones"></textarea>
-      </div>
-      <button type="submit" class="btn btn-success">Registrar limpieza</button>
-    </form>
-  </section>
-  <!--  ===================== FIN SECCIÓN REGISTRO  ===================== -->
 
-<!--  ===================== SECCIÓN HISTORIAL  ===================== -->
-  <section id="historial" class="container mt-5" style="display:none;">
-    <h2>Historial de Limpieza</h2>
-    <table id="tablaHistorial" class="table table-bordered table-striped">
-      <thead class="thead-dark">
-        <tr>
-          <th>Habitación</th>
-          <th>Empleado</th>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>Estado</th>
-          <th>Observaciones</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <footer>Sistema Hotelero - Módulo de Limpieza</footer>
-  </section>
+<section id="registro" class="container mt-5" style="display:none;">
+<h2 class="text-center mb-4">Registro de Limpieza</h2>
 
-<!--  ===================== FIN SECCIÓN HISTORIAL  ===================== -->
+<form id="formRegistro" class="border p-3">
+  <div class="form-group">
+    <label for="regAsignacion">Asignación de limpieza</label>
+    <select class="form-control" id="regAsignacion" required onchange="autocompletarDatosAsignacion()">
+      <option value="">Seleccione una asignación</option>
+    </select>
+  </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <div class="form-group">
+    <label for="regHabitacion">Número de habitación</label>
+    <input type="text" class="form-control campo-solo-lectura" id="regHabitacion" readonly required>
+  </div>
+
+  <div class="form-group">
+    <label for="regEmpleado">Nombre del empleado</label>
+    <input type="text" class="form-control campo-solo-lectura" id="regEmpleado" readonly required>
+  </div>
+
+  <div class="form-group">
+    <label for="regFecha">Fecha</label>
+    <input type="date" class="form-control" id="regFecha" required>
+  </div>
+
+  <div class="form-group">
+    <label for="regHora">Hora</label>
+    <input type="time" class="form-control" id="regHora" required>
+  </div>
+
+  <div class="form-group">
+    <label for="regEstado">Estado</label>
+    <select class="form-control" id="regEstado" required>
+      <option value="">Seleccione un estado</option>
+      <option value="Limpia">Limpia</option>
+      <option value="Sucia">Sucia</option>
+      <option value="Mantenimiento">Mantenimiento</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="regObservaciones">Observaciones</label>
+    <textarea class="form-control" id="regObservaciones"></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-success">Registrar limpieza</button>
+</form>
+</section>
+
+<section id="historial" class="container mt-5" style="display:none;">
+<h2>Historial de Limpieza</h2>
+<table id="tablaHistorial" class="table table-bordered table-striped">
+  <thead class="thead-dark">
+    <tr>
+      <th>Habitación</th>
+      <th>Empleado</th>
+      <th>Fecha</th>
+      <th>Hora</th>
+      <th>Estado</th>
+      <th>Observaciones</th>
+      <th>Acción</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<footer>Sistema Hotelero - Módulo de Limpieza</footer>
+</section>
+
 <script>
-function actualizarEstados(){
-    const tabla = document.getElementById("tablaHabitaciones");
-    const filas = tabla.getElementsByTagName("tr");
+const habitacionesIniciales = [
+  { numero:"101", tipo:"Simple", piso:"1", estado:"Limpia" },
+  { numero:"102", tipo:"Simple", piso:"1", estado:"Sucia" },
+  { numero:"103", tipo:"Simple", piso:"1", estado:"Limpia" },
+  { numero:"104", tipo:"Simple", piso:"1", estado:"Sucia" },
+  { numero:"105", tipo:"Simple", piso:"1", estado:"Limpia" },
 
-    for(let i=1; i<filas.length; i++){
-        const fila = filas[i];
-        const select = fila.getElementsByTagName("select")[0];
-        const estadoCelda = fila.getElementsByTagName("td")[3];
+  { numero:"201", tipo:"Normal", piso:"2", estado:"Limpia" },
+  { numero:"202", tipo:"Normal", piso:"2", estado:"Sucia" },
+  { numero:"203", tipo:"Normal", piso:"2", estado:"Limpia" },
+  { numero:"204", tipo:"Normal", piso:"2", estado:"Sucia" },
+  { numero:"205", tipo:"Normal", piso:"2", estado:"Mantenimiento" },
 
-        estadoCelda.textContent = select.value;
-        fila.className = "";
-        if(select.value === "Limpia") fila.classList.add("fila-limpia");
-        else if(select.value === "Sucia") fila.classList.add("fila-sucia");
-        else if(select.value === "En limpieza") fila.classList.add("fila-limpieza");
-        else if(select.value === "Mantenimiento") fila.classList.add("fila-mantenimiento");
-    }
-}
+  { numero:"301", tipo:"Familiar", piso:"1", estado:"Limpia" },
+  { numero:"302", tipo:"Familiar", piso:"2", estado:"Sucia" },
+  { numero:"303", tipo:"Familiar", piso:"3", estado:"Sucia" },
+  { numero:"304", tipo:"Familiar", piso:"4", estado:"Limpia" },
+  { numero:"305", tipo:"Familiar", piso:"3", estado:"Mantenimiento" },
 
-function actualizarInventario(){
-    const tabla = document.getElementById("tablaInventario");
-    const filas = tabla.getElementsByTagName("tr");
-
-    for(let i=1; i<filas.length; i++){
-        const fila = filas[i];
-        const input = fila.getElementsByTagName("input")[0];
-        const cantidadCelda = fila.getElementsByClassName("cantidad")[0];
-        cantidadCelda.textContent = input.value;
-
-        fila.className = "";
-        if(parseInt(input.value) <= 5) fila.classList.add("bajo-stock");
-        else if(parseInt(input.value) <= 15) fila.classList.add("medio-stock");
-        else fila.classList.add("alto-stock");
-    }
-}
-
-// Datos iniciales de ejemplo
-let registros = JSON.parse(localStorage.getItem("registros")) || [
-  {habitacion:"101", empleado:"Juan Pérez", fecha:"2026-03-18", hora:"10:00", estado:"Completado", observaciones:"Todo en orden"},
-  {habitacion:"102", empleado:"María López", fecha:"2026-03-18", hora:"11:30", estado:"Pendiente", observaciones:"Falta cambiar sábanas"},
-  {habitacion:"103", empleado:"Carlos Gómez", fecha:"2026-03-17", hora:"09:15", estado:"Cancelado", observaciones:"Cliente extendió estadía"},
-  {habitacion:"104", empleado:"Ana Torres", fecha:"2026-03-19", hora:"14:20", estado:"Completado", observaciones:"Habitación desinfectada"},
-  {habitacion:"105", empleado:"Luis Fernández", fecha:"2026-03-19", hora:"16:45", estado:"Pendiente", observaciones:"Reponer toallas"}
+  { numero:"401", tipo:"Lujosa", piso:"4", estado:"Limpia" },
+  { numero:"402", tipo:"Lujosa", piso:"5", estado:"Sucia" },
+  { numero:"403", tipo:"Lujosa", piso:"6", estado:"Limpia" },
+  { numero:"404", tipo:"Lujosa", piso:"6", estado:"Sucia" },
+  { numero:"405", tipo:"Lujosa", piso:"6", estado:"Mantenimiento" }
 ];
 
-// Guardar en localStorage con aviso visual
-function guardarLocal(){
-  localStorage.setItem("registros", JSON.stringify(registros));
-  $("#alertaGuardado").remove(); 
- $("#formRegistro").before(`<div id="alertaGuardado" class="alert alert-success text-center">
-  ✅ Registro guardado en el navegador
-</div>`);
-  setTimeout(()=>$("#alertaGuardado").fadeOut(),3000);
+const inventarioInicial = [
+  { producto:"Jabón", cantidad:50 },
+  { producto:"Toallas", cantidad:30 },
+  { producto:"Detergente", cantidad:20 },
+  { producto:"Guantes", cantidad:100 },
+  { producto:"Desinfectante", cantidad:15 }
+];
+
+function obtenerHabitaciones() {
+  return JSON.parse(localStorage.getItem("habitaciones")) || habitacionesIniciales;
 }
 
-/// Mostrar secciones
-function mostrar(seccion) {
-  $("#habitaciones, #inventario, #tablaAsignacion, #registro, #historial").hide();
+function guardarHabitaciones(habitaciones) {
+  localStorage.setItem("habitaciones", JSON.stringify(habitaciones));
+}
 
-  if(seccion === "registro"){
-    $("#registro, #historial").show();
-    cargarHistorial();
-  } else if(seccion === "habitaciones"){
-    $("#habitaciones, #inventario").show();
-    cargarHistorial();
+function obtenerInventario() {
+  return JSON.parse(localStorage.getItem("inventario")) || inventarioInicial;
+}
+
+function guardarInventario(inventario) {
+  localStorage.setItem("inventario", JSON.stringify(inventario));
+}
+
+function obtenerAsignaciones() {
+  return JSON.parse(localStorage.getItem("asignaciones")) || [];
+}
+
+function guardarAsignaciones(asignaciones) {
+  localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
+}
+
+function obtenerRegistros() {
+  return JSON.parse(localStorage.getItem("registros")) || [];
+}
+
+function guardarRegistros(registros) {
+  localStorage.setItem("registros", JSON.stringify(registros));
+}
+
+function inicializarDatos() {
+  if (!localStorage.getItem("habitaciones")) {
+    guardarHabitaciones(habitacionesIniciales);
+  }
+
+  if (!localStorage.getItem("inventario")) {
+    guardarInventario(inventarioInicial);
+  }
+
+  if (!localStorage.getItem("registros")) {
+    guardarRegistros([]);
+  }
+}
+
+function formatearFecha(fechaISO) {
+  if (!fechaISO) return "";
+  const partes = fechaISO.split("-");
+  if (partes.length !== 3) return fechaISO;
+
+  const anio = parseInt(partes[0]);
+  const mes = parseInt(partes[1]) - 1;
+  const dia = parseInt(partes[2]);
+
+  const meses = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+  ];
+
+  return `${dia} de ${meses[mes]} de ${anio}`;
+}
+
+function formatearHora12(hora24) {
+  if (!hora24) return "";
+  const partes = hora24.split(":");
+  let horas = parseInt(partes[0]);
+  let minutos = partes[1];
+  let periodo = horas >= 12 ? "PM" : "AM";
+
+  horas = horas % 12;
+  if (horas === 0) horas = 12;
+
+  return `${horas}:${minutos} ${periodo}`;
+}
+
+function obtenerFechaActualISO() {
+  const ahora = new Date();
+  const anio = ahora.getFullYear();
+  const mes = String(ahora.getMonth() + 1).padStart(2, "0");
+  const dia = String(ahora.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
+}
+
+function obtenerHoraActual24() {
+  const ahora = new Date();
+  const horas = String(ahora.getHours()).padStart(2, "0");
+  const minutos = String(ahora.getMinutes()).padStart(2, "0");
+  return `${horas}:${minutos}`;
+}
+
+function obtenerClaseEstadoTexto(estado) {
+  if (estado === "Limpia") return "limpia";
+  if (estado === "Sucia") return "sucia";
+  if (estado === "Mantenimiento") return "mantenimiento";
+  return "";
+}
+
+function obtenerClaseFilaEstado(estado) {
+  if (estado === "Limpia") return "fila-limpia";
+  if (estado === "Sucia") return "fila-sucia";
+  if (estado === "Mantenimiento") return "fila-mantenimiento";
+  return "";
+}
+
+function obtenerClaseBadge(estado) {
+  if (estado === "Limpia") return "badge badge-success";
+  if (estado === "Sucia") return "badge badge-warning";
+  if (estado === "Mantenimiento") return "badge badge-danger";
+  return "";
+}
+
+function renderHabitaciones() {
+  const habitaciones = obtenerHabitaciones();
+  const tbody = document.querySelector("#tablaHabitaciones tbody");
+  tbody.innerHTML = "";
+
+  habitaciones.forEach((hab, index) => {
+    const fila = document.createElement("tr");
+    fila.className = obtenerClaseFilaEstado(hab.estado);
+
+    fila.innerHTML = `
+      <td>${hab.numero}</td>
+      <td>${hab.tipo}</td>
+      <td>${hab.piso}</td>
+      <td class="${obtenerClaseEstadoTexto(hab.estado)}">${hab.estado}</td>
+      <td>
+        <select data-index="${index}">
+          <option value="Limpia" ${hab.estado === "Limpia" ? "selected" : ""}>Limpia</option>
+          <option value="Sucia" ${hab.estado === "Sucia" ? "selected" : ""}>Sucia</option>
+          <option value="Mantenimiento" ${hab.estado === "Mantenimiento" ? "selected" : ""}>Mantenimiento</option>
+        </select>
+      </td>
+    `;
+
+    tbody.appendChild(fila);
+  });
+}
+
+function actualizarEstados() {
+  const habitaciones = obtenerHabitaciones();
+  const selects = document.querySelectorAll("#tablaHabitaciones tbody select");
+
+  selects.forEach(select => {
+    const index = parseInt(select.dataset.index);
+    habitaciones[index].estado = select.value;
+  });
+
+  guardarHabitaciones(habitaciones);
+  renderHabitaciones();
+  alert("Estados actualizados correctamente.");
+}
+
+function renderInventario() {
+  const inventario = obtenerInventario();
+  const tbody = document.querySelector("#tablaInventario tbody");
+  tbody.innerHTML = "";
+
+  inventario.forEach((item, index) => {
+    let claseFila = "";
+    if (parseInt(item.cantidad) <= 5) claseFila = "bajo-stock";
+    else if (parseInt(item.cantidad) <= 15) claseFila = "medio-stock";
+    else claseFila = "alto-stock";
+
+    const fila = document.createElement("tr");
+    fila.className = claseFila;
+
+    fila.innerHTML = `
+      <td>${item.producto}</td>
+      <td class="cantidad">${item.cantidad}</td>
+      <td><input type="number" min="0" value="${item.cantidad}" data-index="${index}"></td>
+    `;
+
+    tbody.appendChild(fila);
+  });
+}
+
+function actualizarInventario() {
+  const inventario = obtenerInventario();
+  const inputs = document.querySelectorAll("#tablaInventario tbody input");
+
+  inputs.forEach(input => {
+    const index = parseInt(input.dataset.index);
+    inventario[index].cantidad = parseInt(input.value) || 0;
+  });
+
+  guardarInventario(inventario);
+  renderInventario();
+  alert("Inventario actualizado correctamente.");
+}
+
+function cargarAsignacionesEnRegistro() {
+  const selectAsignacion = document.getElementById("regAsignacion");
+  const asignaciones = obtenerAsignaciones();
+
+  selectAsignacion.innerHTML = `<option value="">Seleccione una asignación</option>`;
+
+  asignaciones
+    .sort((a, b) => {
+      const valorA = (a.fechaISO || "") + " " + (a.hora24 || "");
+      const valorB = (b.fechaISO || "") + " " + (b.hora24 || "");
+      return valorB.localeCompare(valorA);
+    })
+    .forEach(asig => {
+      const option = document.createElement("option");
+      option.value = asig.id;
+      option.textContent = `${asig.habitacion} - ${asig.empleado} - ${asig.fecha} - ${asig.hora}`;
+      selectAsignacion.appendChild(option);
+    });
+}
+
+function autocompletarDatosAsignacion() {
+  const asignacionId = document.getElementById("regAsignacion").value;
+  const asignaciones = obtenerAsignaciones();
+  const asignacion = asignaciones.find(asig => asig.id === asignacionId);
+
+  const inputHabitacion = document.getElementById("regHabitacion");
+  const inputEmpleado = document.getElementById("regEmpleado");
+  const inputFecha = document.getElementById("regFecha");
+  const inputHora = document.getElementById("regHora");
+
+  if (asignacion) {
+    inputHabitacion.value = asignacion.habitacion;
+    inputEmpleado.value = asignacion.empleado;
+    inputFecha.value = obtenerFechaActualISO();
+    inputHora.value = obtenerHoraActual24();
   } else {
-    $("#" + seccion).show();
+    inputHabitacion.value = "";
+    inputEmpleado.value = "";
+    inputFecha.value = "";
+    inputHora.value = "";
+  }
+}
+
+function cargarHistorial() {
+  const registros = obtenerRegistros();
+  const tbody = document.querySelector("#tablaHistorial tbody");
+  tbody.innerHTML = "";
+
+  registros.forEach((reg, index) => {
+    const fila = document.createElement("tr");
+
+    fila.innerHTML = `
+      <td>${reg.habitacion}</td>
+      <td>${reg.empleado}</td>
+      <td>${reg.fechaMostrada || reg.fecha}</td>
+      <td>${reg.horaMostrada || reg.hora}</td>
+      <td><span class="${obtenerClaseBadge(reg.estado)}">${reg.estado}</span></td>
+      <td>${reg.observaciones || ""}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="borrarRegistro(${index})">🗑️</button></td>
+    `;
+
+    tbody.appendChild(fila);
+  });
+}
+
+function borrarRegistro(index) {
+  const registros = obtenerRegistros();
+  registros.splice(index, 1);
+  guardarRegistros(registros);
+  cargarHistorial();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  const formRegistro = document.getElementById("formRegistro");
+
+  formRegistro.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const asignacionId = document.getElementById("regAsignacion").value;
+    const habitacion = document.getElementById("regHabitacion").value.trim();
+    const empleado = document.getElementById("regEmpleado").value.trim();
+    const fechaISO = document.getElementById("regFecha").value;
+    const hora24 = document.getElementById("regHora").value;
+    const estado = document.getElementById("regEstado").value;
+    const observaciones = document.getElementById("regObservaciones").value.trim();
+    const hoy = new Date().toISOString().split("T")[0];
+
+    if (asignacionId === "") {
+      alert("Debes seleccionar una asignación.");
+      return;
+    }
+
+    if (habitacion === "" || empleado === "") {
+      alert("La asignación seleccionada no es válida.");
+      return;
+    }
+
+    if (fechaISO === "") {
+      alert("Debes seleccionar una fecha.");
+      return;
+    }
+
+    if (hora24 === "") {
+      alert("Debes seleccionar una hora.");
+      return;
+    }
+
+    if (fechaISO > hoy) {
+      alert("La fecha no puede ser futura.");
+      return;
+    }
+
+    const nuevoRegistro = {
+      asignacionId,
+      habitacion,
+      empleado,
+      fecha: fechaISO,
+      fechaMostrada: formatearFecha(fechaISO),
+      hora: hora24,
+      horaMostrada: formatearHora12(hora24),
+      estado,
+      observaciones
+    };
+
+    const registros = obtenerRegistros();
+    registros.unshift(nuevoRegistro);
+    guardarRegistros(registros);
+
+    actualizarEstadoHabitacionSegunRegistro(habitacion, estado);
+    actualizarAsignacionSegunRegistro(asignacionId, estado);
+
+    formRegistro.reset();
+    document.getElementById("regHabitacion").value = "";
+    document.getElementById("regEmpleado").value = "";
+
+    cargarHistorial();
+    cargarAsignacionesEnRegistro();
+    renderHabitaciones();
+    mostrar("registro");
+    alert("Registro guardado correctamente.");
+  });
+});
+
+function actualizarEstadoHabitacionSegunRegistro(numeroHabitacion, estadoRegistro) {
+  const habitaciones = obtenerHabitaciones();
+  const index = habitaciones.findIndex(h => h.numero === numeroHabitacion);
+
+  if (index !== -1) {
+    habitaciones[index].estado = estadoRegistro;
+    guardarHabitaciones(habitaciones);
+  }
+}
+
+function actualizarAsignacionSegunRegistro(asignacionId, estadoRegistro) {
+  const asignaciones = obtenerAsignaciones();
+  const index = asignaciones.findIndex(asig => asig.id === asignacionId);
+
+  if (index !== -1) {
+    asignaciones[index].estado = estadoRegistro;
+    guardarAsignaciones(asignaciones);
+  }
+}
+
+function mostrar(seccion) {
+  document.getElementById("habitaciones").style.display = "none";
+  document.getElementById("inventario").style.display = "none";
+  document.getElementById("registro").style.display = "none";
+  document.getElementById("historial").style.display = "none";
+
+  if (seccion === "habitaciones") {
+    document.getElementById("habitaciones").style.display = "block";
+    document.getElementById("inventario").style.display = "block";
+    renderHabitaciones();
+    renderInventario();
+  } else if (seccion === "registro") {
+    document.getElementById("registro").style.display = "block";
+    document.getElementById("historial").style.display = "block";
+    cargarAsignacionesEnRegistro();
+    cargarHistorial();
   }
 }
 
 window.onload = function() {
-  if(window.location.hash === "#registro") {
+  inicializarDatos();
+  renderHabitaciones();
+  renderInventario();
+  cargarHistorial();
+  cargarAsignacionesEnRegistro();
+
+  if (window.location.hash === "#registro") {
     mostrar("registro");
+  } else {
+    mostrar("habitaciones");
   }
 };
-
-// Cargar historial con filtros y paginación
-function cargarHistorial(pagina = 1, porPagina = 5){
-  const tbody = $("#tablaHistorial tbody");
-  tbody.empty();
-
-  const filtroTexto = $("#buscador").val() ? $("#buscador").val().toLowerCase() : "";
-  const filtroEstado = $("#filtroEstado").val() || "";
-
-  let filtrados = registros.filter(reg => {
-    const coincideTexto = reg.empleado.toLowerCase().includes(filtroTexto) ||
-                          reg.habitacion.toLowerCase().includes(filtroTexto);
-    const coincideEstado = filtroEstado === "" || reg.estado === filtroEstado;
-    return coincideTexto && coincideEstado;
-  });
-
-  const inicio = (pagina-1)*porPagina;
-  const fin = inicio+porPagina;
-  const paginaRegistros = filtrados.slice(inicio, fin);
-
-  $.each(paginaRegistros, function(i, reg){
-    let estadoClass = "";
-    if(reg.estado === "Completado") estadoClass = "badge badge-success";
-    else if(reg.estado === "Pendiente") estadoClass = "badge badge-warning";
-    else if(reg.estado === "Cancelado") estadoClass = "badge badge-danger";
-
-    tbody.append(`
-      <tr>
-        <td>${reg.habitacion}</td>
-        <td>${reg.empleado}</td>
-        <td>${reg.fecha}</td>
-        <td>${reg.hora}</td>
-        <td><span class="${estadoClass}">${reg.estado}</span></td>
-        <td>${reg.observaciones}</td>
-        <td><button class="btn btn-danger btn-sm borrar" data-index="${inicio+i}">🗑️</button></td>
-      </tr>
-    `);
-  });
-}
- 
-// Borrar registro del historial
-$(document).on("click", ".borrar", function(){
-  const index = $(this).data("index");
-  registros.splice(index, 1);        
-  guardarLocal();                    
-  cargarHistorial();                
-});
-
-// Capturar envío del formulario con validación y guardado
-$("#formRegistro").on("submit", function(e){
-  e.preventDefault();
-
-  const habitacion = $("#habitacion").val();
-  const empleado = $("#empleado").val();
-  const fecha = $("#fecha").val();
-  const hoy = new Date().toISOString().split("T")[0];
-
-  // Validaciones
-  if(isNaN(habitacion) || habitacion.trim() === ""){
-    $("#habitacion").addClass("is-invalid");
-    alert("La habitación debe ser un número válido.");
-    return;
-  } else {
-    $("#habitacion").removeClass("is-invalid");
-  }
-
-  if(fecha > hoy){
-    $("#fecha").addClass("is-invalid");
-    alert("La fecha no puede ser futura.");
-    return;
-  } else {
-    $("#fecha").removeClass("is-invalid");
-  }
-
-  const nuevoRegistro = {
-    habitacion,
-    empleado,
-    fecha,
-    hora: $("#hora").val(),
-    estado: $("#estado").val(),  
-    observaciones: $("#observaciones").val()
-  };
-
-  // Guardado directo en localStorage (sin servidor)
-  registros.unshift(nuevoRegistro);
-  guardarLocal();
-  $("#formRegistro")[0].reset();
-  mostrar("registro");
-
-  // Notificación visual
-  $("#tablaHistorial").before(`<div class="alert alert-info text-center">
-   Nuevo registro agregado al historial
-  </div>`);
-  setTimeout(()=>$(".alert-info").fadeOut(),3000);
-});
-
-// Inicializar historial al cargar la página
-$(document).ready(function(){
-  cargarHistorial();
-});
-
 </script>
 
 </body>

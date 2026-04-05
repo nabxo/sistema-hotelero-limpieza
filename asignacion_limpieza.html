@@ -126,6 +126,8 @@
                 <option value="401">401</option>
                 <option value="402">402</option>
                 <option value="403">403</option>
+                <option value="404">404</option>
+                <option value="405">405</option>
             </select>
             <br>
 
@@ -174,8 +176,7 @@
             <th>Acciones</th>
         </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
     </table>
 
 </div>
@@ -192,6 +193,37 @@
         localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
     }
 
+    function obtenerHabitaciones() {
+        return JSON.parse(localStorage.getItem("habitaciones")) || [];
+    }
+
+    function guardarHabitaciones(habitaciones) {
+        localStorage.setItem("habitaciones", JSON.stringify(habitaciones));
+    }
+
+    function generarIdUnico() {
+        return "ASIG-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+    }
+
+    function normalizarAsignacionesViejas() {
+        let huboCambios = false;
+
+        asignaciones = asignaciones.map(asig => {
+            if (!asig.id) {
+                huboCambios = true;
+                return {
+                    ...asig,
+                    id: generarIdUnico()
+                };
+            }
+            return asig;
+        });
+
+        if (huboCambios) {
+            guardarAsignaciones();
+        }
+    }
+
     function mostrarMensaje(texto, tipo) {
         const mensaje = document.getElementById("mensaje");
         mensaje.textContent = texto;
@@ -201,6 +233,79 @@
         setTimeout(() => {
             mensaje.style.display = "none";
         }, 2500);
+    }
+
+    function formatearFecha(fechaISO) {
+        if (!fechaISO) return "";
+
+        const partes = fechaISO.split("-");
+        if (partes.length !== 3) return fechaISO;
+
+        const anio = partes[0];
+        const mesIndex = parseInt(partes[1]) - 1;
+        const dia = parseInt(partes[2]);
+
+        const meses = [
+            "enero", "febrero", "marzo", "abril", "mayo", "junio",
+            "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+        ];
+
+        return `${dia} de ${meses[mesIndex]} ${anio}`;
+    }
+
+    function formatearHora12(hora24) {
+        if (!hora24) return "";
+
+        const partes = hora24.split(":");
+        let horas = parseInt(partes[0]);
+        let minutos = partes[1];
+        let periodo = horas >= 12 ? "PM" : "AM";
+
+        horas = horas % 12;
+        if (horas === 0) horas = 12;
+
+        return `${horas}:${minutos} ${periodo}`;
+    }
+
+    function obtenerFechaActualISO() {
+        const ahora = new Date();
+        const anio = ahora.getFullYear();
+        const mes = String(ahora.getMonth() + 1).padStart(2, "0");
+        const dia = String(ahora.getDate()).padStart(2, "0");
+        return `${anio}-${mes}-${dia}`;
+    }
+
+    function obtenerHoraActual24() {
+        const ahora = new Date();
+        const horas = String(ahora.getHours()).padStart(2, "0");
+        const minutos = String(ahora.getMinutes()).padStart(2, "0");
+        return `${horas}:${minutos}`;
+    }
+
+    function autocompletarFechaYHoraActual() {
+        const habitacion = document.getElementById("habitacion").value;
+        const fechaInput = document.getElementById("fecha");
+        const horaInput = document.getElementById("hora");
+
+        if (habitacion !== "") {
+            fechaInput.value = obtenerFechaActualISO();
+            horaInput.value = obtenerHoraActual24();
+        } else {
+            fechaInput.value = "";
+            horaInput.value = "";
+        }
+    }
+
+    function actualizarHabitacionASucia(numeroHabitacion) {
+        const habitaciones = obtenerHabitaciones();
+        if (!habitaciones.length) return;
+
+        const indice = habitaciones.findIndex(h => h.numero === numeroHabitacion);
+
+        if (indice !== -1 && habitaciones[indice].estado !== "Mantenimiento") {
+            habitaciones[indice].estado = "Sucia";
+            guardarHabitaciones(habitaciones);
+        }
     }
 
     function eliminarAsignacion(indice) {
@@ -214,10 +319,12 @@
     }
 
     function editarAsignacion(indice) {
-        document.getElementById("habitacion").value = asignaciones[indice].habitacion;
-        document.getElementById("empleado").value = asignaciones[indice].empleado;
-        document.getElementById("fecha").value = asignaciones[indice].fecha;
-        document.getElementById("hora").value = asignaciones[indice].hora;
+        const asignacion = asignaciones[indice];
+
+        document.getElementById("habitacion").value = asignacion.habitacion;
+        document.getElementById("empleado").value = asignacion.empleado;
+        document.getElementById("fecha").value = asignacion.fechaISO || "";
+        document.getElementById("hora").value = asignacion.hora24 || "";
 
         indiceEditando = indice;
         document.getElementById("btnGuardar").textContent = "Guardar Cambios";
@@ -236,22 +343,27 @@
         return nombre.trim() !== "" && !soloNumeros.test(nombre.trim());
     }
 
-    function existeAsignacionDuplicada(habitacion, fecha, indiceActual = -1) {
+    function existeAsignacionDuplicada(habitacion, fechaISO, hora24, indiceActual = -1) {
         return asignaciones.some((a, index) => {
-            return a.habitacion === habitacion && a.fecha === fecha && index !== indiceActual;
+            const fechaGuardada = a.fechaISO || "";
+            const horaGuardada = a.hora24 || "";
+
+            return a.habitacion === habitacion &&
+                   fechaGuardada === fechaISO &&
+                   horaGuardada === hora24 &&
+                   index !== indiceActual;
         });
     }
 
     document.getElementById("formAsignacion").addEventListener("submit", function(e) {
         e.preventDefault();
 
-        let habitacion = document.getElementById("habitacion").value;
-        let empleado = document.getElementById("empleado").value;
-        let fecha = document.getElementById("fecha").value;
-        let hora = document.getElementById("hora").value;
-        let estado = "Pendiente";
+        const habitacion = document.getElementById("habitacion").value;
+        const empleado = document.getElementById("empleado").value.trim();
+        const fechaISO = document.getElementById("fecha").value;
+        const hora24 = document.getElementById("hora").value;
 
-        if (habitacion === "" || empleado.trim() === "" || fecha === "" || hora === "") {
+        if (habitacion === "" || empleado === "" || fechaISO === "" || hora24 === "") {
             mostrarMensaje("Completa todos los campos", "error");
             return;
         }
@@ -261,17 +373,20 @@
             return;
         }
 
-        if (existeAsignacionDuplicada(habitacion, fecha, indiceEditando)) {
-            mostrarMensaje("Ya existe una asignación para esa habitación en esa fecha", "error");
+        if (existeAsignacionDuplicada(habitacion, fechaISO, hora24, indiceEditando)) {
+            mostrarMensaje("Ya existe una asignación para esa habitación en esa fecha y hora", "error");
             return;
         }
 
-        let datosAsignacion = {
+        const datosAsignacion = {
+            id: indiceEditando === -1 ? generarIdUnico() : asignaciones[indiceEditando].id,
             habitacion: habitacion,
             empleado: empleado,
-            fecha: fecha,
-            hora: hora,
-            estado: estado
+            fechaISO: fechaISO,
+            fecha: formatearFecha(fechaISO),
+            hora24: hora24,
+            hora: formatearHora12(hora24),
+            estado: "Sucia"
         };
 
         if (indiceEditando === -1) {
@@ -285,12 +400,14 @@
         }
 
         guardarAsignaciones();
+        actualizarHabitacionASucia(habitacion);
         aplicarFiltrosYOrden();
         document.getElementById("formAsignacion").reset();
     });
 
     document.getElementById("buscador").addEventListener("input", aplicarFiltrosYOrden);
     document.getElementById("ordenarPor").addEventListener("change", aplicarFiltrosYOrden);
+    document.getElementById("habitacion").addEventListener("change", autocompletarFechaYHoraActual);
 
     function aplicarFiltrosYOrden() {
         let texto = document.getElementById("buscador").value.toLowerCase();
@@ -299,33 +416,33 @@
         let listaFiltrada = asignaciones.filter(a =>
             a.habitacion.toLowerCase().includes(texto) ||
             a.empleado.toLowerCase().includes(texto) ||
-            a.fecha.toLowerCase().includes(texto)
+            (a.fecha && a.fecha.toLowerCase().includes(texto)) ||
+            (a.fechaISO && a.fechaISO.toLowerCase().includes(texto)) ||
+            (a.id && a.id.toLowerCase().includes(texto))
         );
 
         if (orden === "habitacion") {
             listaFiltrada.sort((a, b) => a.habitacion.localeCompare(b.habitacion));
         } else if (orden === "fecha") {
-            listaFiltrada.sort((a, b) => a.fecha.localeCompare(b.fecha));
+            listaFiltrada.sort((a, b) => {
+                const valorA = (a.fechaISO || "") + " " + (a.hora24 || "");
+                const valorB = (b.fechaISO || "") + " " + (b.hora24 || "");
+                return valorA.localeCompare(valorB);
+            });
         }
 
         const listaConIndices = listaFiltrada.map(item => {
             return {
                 ...item,
-                indiceOriginal: asignaciones.findIndex(a =>
-                    a.habitacion === item.habitacion &&
-                    a.empleado === item.empleado &&
-                    a.fecha === item.fecha &&
-                    a.hora === item.hora &&
-                    a.estado === item.estado
-                )
+                indiceOriginal: asignaciones.findIndex(a => a.id === item.id)
             };
         });
 
-        let tbody = document.querySelector("#tablaAsignaciones tbody");
+        const tbody = document.querySelector("#tablaAsignaciones tbody");
         tbody.innerHTML = "";
 
         listaConIndices.forEach(function(asignacion) {
-            let fila = document.createElement("tr");
+            const fila = document.createElement("tr");
 
             fila.innerHTML = `
                 <td>${asignacion.habitacion}</td>
@@ -343,6 +460,7 @@
         });
     }
 
+    normalizarAsignacionesViejas();
     aplicarFiltrosYOrden();
 </script>
 
