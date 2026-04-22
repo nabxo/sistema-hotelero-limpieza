@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Asignación de Limpieza - Sistema Hotelero</title>
     <link rel="stylesheet" href="estilos_limpieza.css">
     <style>
@@ -201,10 +204,100 @@
         localStorage.setItem("habitaciones", JSON.stringify(habitaciones));
     }
 
+    // Envia datos al PHP
+    async function enviarJSON(url, datos) {
+        const respuesta = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(datos)
+        });
+
+        const texto = await respuesta.text();
+        let json = {};
+
+        try {
+            json = texto ? JSON.parse(texto) : {};
+        } catch (error) {
+            throw new Error("La respuesta del servidor no es valida.");
+        }
+
+        if (!respuesta.ok || json.ok === false) {
+            const detalle = json.error ? " Detalle: " + json.error : "";
+            throw new Error((json.mensaje || "No se pudo completar la operacion.") + detalle);
+        }
+
+        return json;
+    }
+
+    function normalizarAsignacion(asig) {
+        return {
+            id: asig.id,
+            habitacion: asig.habitacion,
+            empleado: asig.empleado,
+            fechaISO: asig.fechaISO,
+            fecha: asig.fecha || formatearFecha(asig.fechaISO),
+            hora24: asig.hora24,
+            hora: asig.hora || formatearHora12(asig.hora24),
+            estado: asig.estado || "Sucia"
+        };
+    }
+
+    async function cargarDatosServidor() {
+        const respuesta = await fetch("php/obtener_datos.php", { cache: "no-store" });
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok || datos.ok === false) {
+            throw new Error(datos.mensaje || "No se pudieron cargar los datos.");
+        }
+
+        return datos;
+    }
+
+    // Si MySQL esta vacio, manda lo que ya este guardado local
+    async function sincronizarConServidorSiHaceFalta() {
+        const datosServidor = await cargarDatosServidor();
+        const servidorVacio = datosServidor.habitaciones.length === 0 &&
+                             datosServidor.inventario.length === 0 &&
+                             datosServidor.asignaciones.length === 0 &&
+                             datosServidor.registros.length === 0;
+
+        if (servidorVacio) {
+            await enviarJSON("php/sincronizar_datos.php", {
+                habitaciones: obtenerHabitaciones(),
+                inventario: JSON.parse(localStorage.getItem("inventario")) || [],
+                asignaciones: asignaciones,
+                registros: JSON.parse(localStorage.getItem("registros")) || []
+            });
+
+            return await cargarDatosServidor();
+        }
+
+        return datosServidor;
+    }
+
+    // Trae datos de MySQL y los pasa a localStorage
+    async function inicializarDesdeServidor() {
+        try {
+            const datos = await sincronizarConServidorSiHaceFalta();
+
+            if (datos.habitaciones.length) {
+                guardarHabitaciones(datos.habitaciones);
+            }
+
+            asignaciones = (datos.asignaciones || []).map(normalizarAsignacion);
+            guardarAsignaciones();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     function generarIdUnico() {
         return "ASIG-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
     }
 
+    // A algunas asignaciones viejas les faltaba id
     function normalizarAsignacionesViejas() {
         let huboCambios = false;
 
@@ -296,6 +389,7 @@
         }
     }
 
+    // Cuando se asigna limpieza, la habitacion pasa a sucia
     function actualizarHabitacionASucia(numeroHabitacion) {
         const habitaciones = obtenerHabitaciones();
         if (!habitaciones.length) return;
@@ -308,12 +402,26 @@
         }
     }
 
-    function eliminarAsignacion(indice) {
+    // Borra la asignacion local y tambien en MySQL
+    async function eliminarAsignacion(indice) {
         const confirmar = confirm("¿Seguro que deseas eliminar esta asignación?");
         if (!confirmar) return;
 
+        const asignacionEliminada = asignaciones[indice];
         asignaciones.splice(indice, 1);
         guardarAsignaciones();
+
+        if (asignacionEliminada && asignacionEliminada.id) {
+            try {
+                await enviarJSON("php/eliminar_asignacion.php", {
+                    id: asignacionEliminada.id
+                });
+            } catch (error) {
+                console.error(error);
+                mostrarMensaje("Se eliminó localmente, pero fallo la base de datos", "error");
+            }
+        }
+
         aplicarFiltrosYOrden();
         mostrarMensaje("Asignación eliminada correctamente", "exito");
     }
@@ -343,6 +451,7 @@
         return nombre.trim() !== "" && !soloNumeros.test(nombre.trim());
     }
 
+    // Evita repetir la misma asignacion
     function existeAsignacionDuplicada(habitacion, fechaISO, hora24, indiceActual = -1) {
         return asignaciones.some((a, index) => {
             const fechaGuardada = a.fechaISO || "";
@@ -355,7 +464,7 @@
         });
     }
 
-    document.getElementById("formAsignacion").addEventListener("submit", function(e) {
+    document.getElementById("formAsignacion").addEventListener("submit", async function(e) {
         e.preventDefault();
 
         const habitacion = document.getElementById("habitacion").value;
@@ -400,6 +509,15 @@
         }
 
         guardarAsignaciones();
+
+        try {
+            await enviarJSON("php/guardar_asignacion.php", datosAsignacion);
+        } catch (error) {
+            console.error(error);
+            // Si falla MySQL, al menos queda guardada local
+            mostrarMensaje("Se guardó localmente, pero no en MySQL. " + error.message, "error");
+        }
+
         actualizarHabitacionASucia(habitacion);
         aplicarFiltrosYOrden();
         document.getElementById("formAsignacion").reset();
@@ -409,6 +527,7 @@
     document.getElementById("ordenarPor").addEventListener("change", aplicarFiltrosYOrden);
     document.getElementById("habitacion").addEventListener("change", autocompletarFechaYHoraActual);
 
+    // Actualiza la tabla de asignaciones
     function aplicarFiltrosYOrden() {
         let texto = document.getElementById("buscador").value.toLowerCase();
         let orden = document.getElementById("ordenarPor").value;
@@ -460,8 +579,11 @@
         });
     }
 
-    normalizarAsignacionesViejas();
-    aplicarFiltrosYOrden();
+    window.addEventListener("load", async function() {
+        normalizarAsignacionesViejas();
+        await inicializarDesdeServidor();
+        aplicarFiltrosYOrden();
+    });
 </script>
 
 </body>

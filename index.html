@@ -2,6 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Control de Habitaciones e Inventario - Sistema Hotelero</title>
 <link rel="stylesheet" href="estilos_limpieza.css">
 <style>
@@ -202,6 +205,114 @@ function guardarRegistros(registros) {
   localStorage.setItem("registros", JSON.stringify(registros));
 }
 
+// Envia datos al PHP
+async function enviarJSON(url, datos) {
+  const respuesta = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(datos)
+  });
+
+  const texto = await respuesta.text();
+  let json = {};
+
+  try {
+    json = texto ? JSON.parse(texto) : {};
+  } catch (error) {
+    throw new Error("La respuesta del servidor no es valida.");
+  }
+
+  if (!respuesta.ok || json.ok === false) {
+    const detalle = json.error ? " Detalle: " + json.error : "";
+    throw new Error((json.mensaje || "No se pudo completar la operacion.") + detalle);
+  }
+
+  return json;
+}
+
+function normalizarAsignacion(asig) {
+  return {
+    id: asig.id,
+    habitacion: asig.habitacion,
+    empleado: asig.empleado,
+    fechaISO: asig.fechaISO,
+    fecha: asig.fecha || formatearFecha(asig.fechaISO),
+    hora24: asig.hora24,
+    hora: asig.hora || formatearHora12(asig.hora24),
+    estado: asig.estado || "Sucia"
+  };
+}
+
+function normalizarRegistro(registro) {
+  return {
+    idRegistro: registro.idRegistro || null,
+    asignacionId: registro.asignacionId,
+    habitacion: registro.habitacion,
+    empleado: registro.empleado,
+    fecha: registro.fecha,
+    fechaMostrada: registro.fechaMostrada || formatearFecha(registro.fecha),
+    hora: registro.hora,
+    horaMostrada: registro.horaMostrada || formatearHora12(registro.hora),
+    estado: registro.estado,
+    observaciones: registro.observaciones || ""
+  };
+}
+
+async function cargarDatosDesdeServidor() {
+  const respuesta = await fetch("php/obtener_datos.php", { cache: "no-store" });
+  const datos = await respuesta.json();
+
+  if (!respuesta.ok || datos.ok === false) {
+    throw new Error(datos.mensaje || "No se pudieron cargar los datos.");
+  }
+
+  return datos;
+}
+
+// Si la base esta vacia, manda lo que haya en localStorage
+async function sincronizarConServidorSiHaceFalta() {
+  const datosServidor = await cargarDatosDesdeServidor();
+  const servidorVacio = datosServidor.habitaciones.length === 0 &&
+                        datosServidor.inventario.length === 0 &&
+                        datosServidor.asignaciones.length === 0 &&
+                        datosServidor.registros.length === 0;
+
+  if (servidorVacio) {
+    await enviarJSON("php/sincronizar_datos.php", {
+      habitaciones: obtenerHabitaciones(),
+      inventario: obtenerInventario(),
+      asignaciones: obtenerAsignaciones(),
+      registros: obtenerRegistros()
+    });
+
+    return await cargarDatosDesdeServidor();
+  }
+
+  return datosServidor;
+}
+
+// Trae lo de MySQL y lo vuelve a guardar localmente
+async function inicializarDesdeServidor() {
+  try {
+    const datos = await sincronizarConServidorSiHaceFalta();
+
+    if (datos.habitaciones.length) {
+      guardarHabitaciones(datos.habitaciones);
+    }
+
+    if (datos.inventario.length) {
+      guardarInventario(datos.inventario);
+    }
+
+    guardarAsignaciones((datos.asignaciones || []).map(normalizarAsignacion));
+    guardarRegistros((datos.registros || []).map(normalizarRegistro));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 function inicializarDatos() {
   if (!localStorage.getItem("habitaciones")) {
     guardarHabitaciones(habitacionesIniciales);
@@ -309,7 +420,8 @@ function renderHabitaciones() {
   });
 }
 
-function actualizarEstados() {
+// Guarda estados en local y en MySQL
+async function actualizarEstados() {
   const habitaciones = obtenerHabitaciones();
   const selects = document.querySelectorAll("#tablaHabitaciones tbody select");
 
@@ -319,6 +431,11 @@ function actualizarEstados() {
   });
 
   guardarHabitaciones(habitaciones);
+  try {
+    await enviarJSON("php/guardar_habitaciones.php", { habitaciones });
+  } catch (error) {
+    console.error(error);
+  }
   renderHabitaciones();
   alert("Estados actualizados correctamente.");
 }
@@ -347,7 +464,8 @@ function renderInventario() {
   });
 }
 
-function actualizarInventario() {
+// Guarda inventario en local y en MySQL
+async function actualizarInventario() {
   const inventario = obtenerInventario();
   const inputs = document.querySelectorAll("#tablaInventario tbody input");
 
@@ -357,6 +475,11 @@ function actualizarInventario() {
   });
 
   guardarInventario(inventario);
+  try {
+    await enviarJSON("php/guardar_inventario.php", { inventario });
+  } catch (error) {
+    console.error(error);
+  }
   renderInventario();
   alert("Inventario actualizado correctamente.");
 }
@@ -426,17 +549,30 @@ function cargarHistorial() {
   });
 }
 
-function borrarRegistro(index) {
+// Borra el registro local y tambien en MySQL si ya existe
+async function borrarRegistro(index) {
   const registros = obtenerRegistros();
+  const registroEliminado = registros[index];
   registros.splice(index, 1);
   guardarRegistros(registros);
+
+  if (registroEliminado && registroEliminado.idRegistro) {
+    try {
+      await enviarJSON("php/eliminar_registro.php", {
+        idRegistro: registroEliminado.idRegistro
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   cargarHistorial();
 }
 
 document.addEventListener("DOMContentLoaded", function() {
   const formRegistro = document.getElementById("formRegistro");
 
-  formRegistro.addEventListener("submit", function(e) {
+  formRegistro.addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const asignacionId = document.getElementById("regAsignacion").value;
@@ -487,6 +623,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const registros = obtenerRegistros();
     registros.unshift(nuevoRegistro);
+    
+    try {
+      const respuesta = await enviarJSON("php/guardar_registro.php", nuevoRegistro);
+      nuevoRegistro.idRegistro = respuesta.idRegistro || null;
+    } catch (error) {
+      console.error(error);
+      // Si falla MySQL, al menos queda guardado local
+      alert("El registro se guardo en el navegador, pero no se pudo guardar en MySQL.");
+    }
+
     guardarRegistros(registros);
 
     actualizarEstadoHabitacionSegunRegistro(habitacion, estado);
@@ -504,6 +650,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
+// Cambia el estado de la habitacion
 function actualizarEstadoHabitacionSegunRegistro(numeroHabitacion, estadoRegistro) {
   const habitaciones = obtenerHabitaciones();
   const index = habitaciones.findIndex(h => h.numero === numeroHabitacion);
@@ -514,6 +661,7 @@ function actualizarEstadoHabitacionSegunRegistro(numeroHabitacion, estadoRegistr
   }
 }
 
+// Cambia el estado de la asignacion
 function actualizarAsignacionSegunRegistro(asignacionId, estadoRegistro) {
   const asignaciones = obtenerAsignaciones();
   const index = asignaciones.findIndex(asig => asig.id === asignacionId);
@@ -543,8 +691,10 @@ function mostrar(seccion) {
   }
 }
 
-window.onload = function() {
+// Carga inicial
+window.onload = async function() {
   inicializarDatos();
+  await inicializarDesdeServidor();
   renderHabitaciones();
   renderInventario();
   cargarHistorial();
