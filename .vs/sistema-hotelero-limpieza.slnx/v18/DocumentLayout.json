@@ -1,0 +1,69 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\limpieza\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\js\\limpieza\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\limpieza\\asignacion.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\js\\limpieza\\asignacion.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\empleados\\empleados.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\js\\empleados\\empleados.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "index.js",
+              "DocumentMoniker": "C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\limpieza\\index.js",
+              "RelativeDocumentMoniker": "assets\\js\\limpieza\\index.js",
+              "ToolTip": "C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\limpieza\\index.js",
+              "RelativeToolTip": "assets\\js\\limpieza\\index.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-05-07T17:13:51.155Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "asignacion.js",
+              "DocumentMoniker": "C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\limpieza\\asignacion.js",
+              "RelativeDocumentMoniker": "assets\\js\\limpieza\\asignacion.js",
+              "ToolTip": "C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\limpieza\\asignacion.js",
+              "RelativeToolTip": "assets\\js\\limpieza\\asignacion.js",
+              "ViewState": "AgIAAK4AAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-05-07T17:13:44.846Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "empleados.js",
+              "DocumentMoniker": "C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\empleados\\empleados.js",
+              "RelativeDocumentMoniker": "assets\\js\\empleados\\empleados.js",
+              "ToolTip": "C:\\Users\\nowel\\Desktop\\sistema-hotelero-limpieza\\assets\\js\\empleados\\empleados.js",
+              "RelativeToolTip": "assets\\js\\empleados\\empleados.js",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAswAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-05-07T17:13:24.387Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

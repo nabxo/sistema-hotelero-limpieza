@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel UASD &middot; Limpieza</title>
+<link rel="icon" type="image/png" href="assets/img/logo-hotel.png">
+<link rel="prefetch" href="asignacion_limpieza.html">
+<link rel="stylesheet" href="assets/css/estilos_limpieza.css">
+<style>
+  html, body {
+    background: #f8fafc;
+    color: #1e293b;
+  }
+
+  .app-layout {
+    min-height: 100vh;
+  }
+
+  .campo-solo-lectura {
+    background-color: #f2f2f2;
+  }
+</style>
+</head>
+
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">
+        <img src="assets/img/logo-hotel.png" alt="Logo Hotel UASD" class="logo-icon-img">
+      </div>
+      <div class="logo-texto">
+        <h2>Hotel UASD</h2>
+        <small>Sistema Interno</small>
+      </div>
+    </div>
+
+    <div class="sidebar-menu">
+      <div class="menu-seccion">
+        <div class="menu-titulo">Principal</div>
+        <a href="#" class="menu-item">
+          <span class="icono">&#127968;</span>
+          <span class="texto-menu">Dashboard</span>
+        </a>
+      </div>
+
+      <div class="menu-seccion">
+        <div class="menu-titulo">Operaciones</div>
+        <a href="index.html" class="menu-item activo">
+          <span class="icono">&#129529;</span>
+          <span class="texto-menu">Limpieza</span>
+        </a>
+        <a href="empleados_limpieza.html" class="menu-item">
+          <span class="icono">&#128101;</span>
+          <span class="texto-menu">Empleados</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="usuario-avatar">L</div>
+        <div class="usuario-datos">
+          <span class="usuario-nombre">Limpieza</span>
+          <span class="usuario-rol">Limpieza</span>
+        </div>
+      </div>
+      <button type="button" class="btn-cerrar-sesion">Cerrar Sesi&oacute;n</button>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn-toggle-sidebar" id="toggleSidebar" title="Abrir men&uacute;">&#9776;</button>
+        <h1 id="page-title">Limpieza</h1>
+      </div>
+      <div class="hora-actual" id="horaActual">--:--</div>
+    </header>
+
+    <div class="limpieza-module">
+      <div class="sub-nav">
+        <button class="sub-nav-btn activo" data-seccion="habitaciones" onclick="mostrar('habitaciones')">Control de Habitaciones</button>
+        <a href="asignacion_limpieza.html" class="sub-nav-btn-link"><span class="sub-nav-btn">Asignaci&oacute;n de Limpieza</span></a>
+        <button class="sub-nav-btn" data-seccion="registro" onclick="mostrar('registro')">Registro de Limpieza</button>
+      </div>
+
+      <section id="habitaciones" class="sub-tab-content">
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="kpi-valor kpi-verde" id="kpi-limpias">0</div>
+            <div class="kpi-label">Limpias</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-valor kpi-naranja" id="kpi-sucias">0</div>
+            <div class="kpi-label">Sucias</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-valor" style="color:var(--texto-2)" id="kpi-mantenimiento">0</div>
+            <div class="kpi-label">Mantenimiento</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-valor kpi-azul" id="kpi-total">0</div>
+            <div class="kpi-label">Total Habitaciones</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-titulo">Estado de Habitaciones</span>
+            <div class="panel-header-actions">
+              <button class="btn btn-secundario btn-inventario-panel" type="button" onclick="abrirHistorial()">Historial de Limpieza</button>
+              <button class="btn btn-secundario btn-inventario-panel" type="button" onclick="abrirInventario()">Inventario</button>
+            </div>
+          </div>
+          <div class="tabla-wrap">
+            <table id="tablaHabitaciones" class="modulo-table">
+              <thead>
+                <tr>
+                  <th>Hab.</th>
+                  <th>Tipo</th>
+                  <th>Piso</th>
+                  <th>Estado</th>
+                  <th>Observaciones</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="panel-footer-actions">
+            <button onclick="actualizarEstados()" class="btn btn-primario">Actualizar estados</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="registro" class="sub-tab-content" style="display:none;">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-titulo">Registro de Limpieza</span>
+          </div>
+          <div class="panel-body">
+            <form id="formRegistro" class="grid-2 form-grid-tight">
+              <div class="form-group">
+                <label for="regAsignacion" class="form-label">Asignaci&oacute;n de limpieza</label>
+                <select class="form-control" id="regAsignacion" required onchange="autocompletarDatosAsignacion()">
+                  <option value="">Seleccione una asignaci&oacute;n</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="regHabitacion" class="form-label">N&uacute;mero de habitaci&oacute;n</label>
+                <input type="text" class="form-control campo-solo-lectura" id="regHabitacion" readonly required>
+              </div>
+
+              <div class="form-group">
+                <label for="regEmpleado" class="form-label">Nombre del empleado</label>
+                <input type="text" class="form-control campo-solo-lectura" id="regEmpleado" readonly required>
+              </div>
+
+              <div class="form-group">
+                <label for="regFecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="regFecha" required>
+              </div>
+
+              <div class="form-group">
+                <label for="regHora" class="form-label">Hora</label>
+                <input type="time" class="form-control" id="regHora" required>
+              </div>
+
+              <div class="form-group">
+                <label for="regEstado" class="form-label">Estado</label>
+                <select class="form-control" id="regEstado" required>
+                  <option value="">Seleccione un estado</option>
+                  <option value="Limpia">Limpia</option>
+                  <option value="Sucia">Sucia</option>
+                  <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+              </div>
+
+              <div class="form-group form-group-full">
+                <label for="regObservaciones" class="form-label">Observaciones</label>
+                <textarea class="form-control" id="regObservaciones"></textarea>
+              </div>
+
+              <div class="form-group form-group-full form-actions-end">
+                <button type="submit" class="btn btn-primario">Registrar limpieza</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalInventario" style="display:none;">
+  <div class="modal-box modal-box-xl inventory-drawer">
+    <div class="modal-header">
+      <span class="modal-titulo">Inventario de Limpieza</span>
+      <button type="button" class="modal-cerrar" onclick="cerrarInventario()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="inventario-resumen">
+        <div class="inventario-card inventario-card-info">
+          <span>Productos registrados</span>
+          <strong id="inv-total-productos">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-warning">
+          <span>Poca cantidad</span>
+          <strong id="inv-stock-bajo">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-ok">
+          <span>Cantidad suficiente</span>
+          <strong id="inv-stock-ok">0</strong>
+        </div>
+      </div>
+
+      <div class="panel inventario-modal-panel">
+        <div class="panel-header">
+          <span class="panel-titulo">Control de Inventario de Limpieza</span>
+          <span class="helper-inline">Actualiza las cantidades disponibles y guarda los cambios.</span>
+        </div>
+        <div class="tabla-wrap">
+          <table id="tablaInventario" class="modulo-table inventario-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Disponible</th>
+                <th>Estado</th>
+                <th>Nueva cantidad</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secundario" onclick="cerrarInventario()">Cerrar</button>
+      <button type="button" class="btn btn-primario" onclick="actualizarInventario()">Actualizar inventario</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalHistorial" style="display:none;">
+  <div class="modal-box modal-box-xl inventory-drawer history-drawer">
+    <div class="modal-header">
+      <span class="modal-titulo">Historial de Limpieza</span>
+      <button type="button" class="modal-cerrar" onclick="cerrarHistorial()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <div class="history-toolbar-wrap">
+          <div class="form-group history-date-group">
+            <label for="historialDesde" class="form-label">Desde</label>
+            <input type="date" class="form-control" id="historialDesde">
+          </div>
+        <div class="form-group history-date-group">
+            <label for="historialHasta" class="form-label">Hasta</label>
+            <input type="date" class="form-control" id="historialHasta">
+          </div>
+          <button type="button" class="btn btn-secundario" onclick="aplicarFiltroHistorial()">Filtrar</button>
+          <button type="button" class="btn btn-primario" onclick="abrirModalFormatoHistorial()">Imprimir</button>
+        </div>
+
+      <div class="history-report-grid">
+        <div class="inventario-card inventario-card-info">
+          <span>Registros en rango</span>
+          <strong id="historialTotal">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-ok">
+          <span>Trabajos cumplidos</span>
+          <strong id="historialCumplidos">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-warning">
+          <span>Pendientes o con incidencia</span>
+          <strong id="historialPendientes">0</strong>
+        </div>
+      </div>
+
+      <div class="panel inventario-modal-panel">
+        <div class="panel-header">
+          <span class="panel-titulo">Movimientos del historial</span>
+          <span class="helper-inline">Incluye fecha de asignaci&oacute;n, empleado responsable y cumplimiento.</span>
+        </div>
+        <div class="panel-body">
+          <div id="timelineHistorial" class="limp-timeline">
+            <div class="limp-empty">
+              <div class="limp-empty-icon">&#128203;</div>
+              Sin historial para mostrar.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secundario" onclick="cerrarHistorial()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalFormatoHistorial" style="display:none;">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <span class="modal-titulo">Formato de impresión</span>
+        <button type="button" class="modal-cerrar" onclick="cerrarModalFormatoHistorial()">&times;</button>
+      </div>
+      <div class="modal-body export-format-body">
+        <p class="export-format-texto">Seleccione cómo quiere generar el historial de limpieza.</p>
+        <div class="export-format-grid">
+          <button type="button" class="btn btn-secundario" onclick="exportarHistorial('word')">Word</button>
+          <button type="button" class="btn btn-primario" onclick="exportarHistorial('pdf')">PDF</button>
+          <button type="button" class="btn btn-secundario" onclick="exportarHistorial('json')">JSON</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secundario" onclick="cerrarModalFormatoHistorial()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<div class="modal-overlay" id="modalCambioEstado" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-titulo">Cambiar Estado</span>
+      <button type="button" class="modal-cerrar" onclick="cerrarModalEstado()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modalHabitacionIndice">
+      <div class="form-group">
+        <label for="modalHabitacionNumero" class="form-label">Habitaci&oacute;n</label>
+        <input type="text" id="modalHabitacionNumero" class="form-control campo-solo-lectura" readonly>
+      </div>
+      <div class="form-group">
+        <label for="modalHabitacionEstado" class="form-label">Nuevo estado</label>
+        <select id="modalHabitacionEstado" class="form-control">
+          <option value="Limpia">Limpia</option>
+          <option value="Sucia">Sucia</option>
+          <option value="Mantenimiento">Mantenimiento</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="modalHabitacionObs" class="form-label">Observaciones</label>
+        <textarea id="modalHabitacionObs" class="form-control"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secundario" onclick="cerrarModalEstado()">Cancelar</button>
+      <button type="button" class="btn btn-primario" onclick="guardarCambioEstado()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/limpieza/index.js"></script>
+
+</body>
+</html>
