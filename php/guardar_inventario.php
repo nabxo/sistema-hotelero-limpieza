@@ -28,15 +28,12 @@ try {
     }
 
     $conexion->commit();
+    intentarSincronizarMongoDesdeMySQL($conexion);
     responderJson(["ok" => true, "mensaje" => "Inventario guardado"]);
 } catch (Throwable $e) {
     if (isset($conexion)) {
         $conexion->rollback();
     }
-    responderJson([
-        "ok" => false,
-        "mensaje" => "No se pudo guardar el inventario",
-        "error" => $e->getMessage()
-    ], 500);
+    manejarErrorServidor("No se pudo guardar el inventario", $e);
 }
 ?>

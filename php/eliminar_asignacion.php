@@ -15,12 +15,9 @@ try {
     $stmt->bind_param("s", $codigo);
     $stmt->execute();
 
+    intentarSincronizarMongoDesdeMySQL($conexion);
     responderJson(["ok" => true, "mensaje" => "Asignacion eliminada"]);
 } catch (Throwable $e) {
-    responderJson([
-        "ok" => false,
-        "mensaje" => "No se pudo eliminar la asignacion",
-        "error" => $e->getMessage()
-    ], 500);
+    manejarErrorServidor("No se pudo eliminar la asignacion", $e);
 }
 ?>

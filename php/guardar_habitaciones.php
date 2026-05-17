@@ -32,15 +32,12 @@ try {
     }
 
     $conexion->commit();
+    intentarSincronizarMongoDesdeMySQL($conexion);
     responderJson(["ok" => true, "mensaje" => "Habitaciones guardadas"]);
 } catch (Throwable $e) {
     if (isset($conexion)) {
         $conexion->rollback();
     }
-    responderJson([
-        "ok" => false,
-        "mensaje" => "No se pudieron guardar las habitaciones",
-        "error" => $e->getMessage()
-    ], 500);
+    manejarErrorServidor("No se pudieron guardar las habitaciones", $e);
 }
 ?>

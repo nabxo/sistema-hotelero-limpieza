@@ -15,12 +15,9 @@ try {
     $stmt->bind_param("i", $idRegistro);
     $stmt->execute();
 
+    intentarSincronizarMongoDesdeMySQL($conexion);
     responderJson(["ok" => true, "mensaje" => "Registro eliminado"]);
 } catch (Throwable $e) {
-    responderJson([
-        "ok" => false,
-        "mensaje" => "No se pudo eliminar el registro",
-        "error" => $e->getMessage()
-    ], 500);
+    manejarErrorServidor("No se pudo eliminar el registro", $e);
 }
 ?>

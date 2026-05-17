@@ -5,9 +5,21 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Control de Habitaciones e Inventario - Sistema Hotelero</title>
-<link rel="stylesheet" href="estilos_limpieza.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel UASD &middot; Limpieza</title>
+<link rel="icon" type="image/png" href="assets/img/logo-hotel.png">
+<link rel="prefetch" href="asignacion_limpieza.html">
+<link rel="stylesheet" href="assets/css/estilos_limpieza.css">
 <style>
+  html, body {
+    background: #f8fafc;
+    color: #1e293b;
+  }
+
+  .app-layout {
+    min-height: 100vh;
+  }
+
   .campo-solo-lectura {
     background-color: #f2f2f2;
   }
@@ -15,698 +27,339 @@
 </head>
 
 <body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">
+        <img src="assets/img/logo-hotel.png" alt="Logo Hotel UASD" class="logo-icon-img">
+      </div>
+      <div class="logo-texto">
+        <h2>Hotel UASD</h2>
+        <small>Sistema Interno</small>
+      </div>
+    </div>
 
-<header>
-<h1>Sistema de Gestión Hotelera</h1>
-<p>Módulo de Limpieza</p>
-</header>
+    <div class="sidebar-menu">
+      <div class="menu-seccion">
+        <div class="menu-titulo">Principal</div>
+        <a href="#" class="menu-item">
+          <span class="icono">&#127968;</span>
+          <span class="texto-menu">Dashboard</span>
+        </a>
+      </div>
 
-<nav>
-<a href="#" onclick="mostrar('habitaciones')">Control de Habitaciones</a>
-<a href="asignacion_limpieza.html">Asignación de Limpieza</a>
-<a href="#" onclick="mostrar('registro')">Registro de Limpieza</a>
-</nav>
+      <div class="menu-seccion">
+        <div class="menu-titulo">Operaciones</div>
+        <a href="index.html" class="menu-item activo">
+          <span class="icono">&#129529;</span>
+          <span class="texto-menu">Limpieza</span>
+        </a>
+        <a href="empleados_limpieza.html" class="menu-item">
+          <span class="icono">&#128101;</span>
+          <span class="texto-menu">Empleados</span>
+        </a>
+      </div>
+    </div>
 
-<section id="habitaciones" class="container mt-5">
-<h2>Estado actual de las habitaciones</h2>
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="usuario-avatar">L</div>
+        <div class="usuario-datos">
+          <span class="usuario-nombre">Limpieza</span>
+          <span class="usuario-rol">Limpieza</span>
+        </div>
+      </div>
+      <button type="button" class="btn-cerrar-sesion">Cerrar Sesi&oacute;n</button>
+    </div>
+  </aside>
 
-<table id="tablaHabitaciones">
-<thead>
-<tr>
-<th>Habitación</th>
-<th>Tipo</th>
-<th>Piso</th>
-<th>Estado</th>
-<th>Cambiar Estado</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-<br>
-<button onclick="actualizarEstados()">Actualizar Estados</button>
-</section>
+  <main class="main-content">
+    <header class="top-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn-toggle-sidebar" id="toggleSidebar" title="Abrir men&uacute;">&#9776;</button>
+        <h1 id="page-title">Limpieza</h1>
+      </div>
+      <div class="hora-actual" id="horaActual">--:--</div>
+    </header>
 
-<section id="inventario" class="container mt-5" style="display:none;">
-<h2>Control de Inventario de Limpieza</h2>
+    <div class="limpieza-module">
+      <div class="sub-nav">
+        <button class="sub-nav-btn activo" data-seccion="habitaciones" onclick="mostrar('habitaciones')">Control de Habitaciones</button>
+        <a href="asignacion_limpieza.html" class="sub-nav-btn-link"><span class="sub-nav-btn">Asignaci&oacute;n de Limpieza</span></a>
+        <button class="sub-nav-btn" data-seccion="registro" onclick="mostrar('registro')">Registro de Limpieza</button>
+      </div>
 
-<table id="tablaInventario">
-<thead>
-<tr>
-<th>Producto</th>
-<th>Cantidad Disponible</th>
-<th>Actualizar Cantidad</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+      <section id="habitaciones" class="sub-tab-content">
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="kpi-valor kpi-verde" id="kpi-limpias">0</div>
+            <div class="kpi-label">Limpias</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-valor kpi-naranja" id="kpi-sucias">0</div>
+            <div class="kpi-label">Sucias</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-valor" style="color:var(--texto-2)" id="kpi-mantenimiento">0</div>
+            <div class="kpi-label">Mantenimiento</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-valor kpi-azul" id="kpi-total">0</div>
+            <div class="kpi-label">Total Habitaciones</div>
+          </div>
+        </div>
 
-<br>
-<button onclick="actualizarInventario()">Actualizar Inventario</button>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-titulo">Estado de Habitaciones</span>
+            <div class="panel-header-actions">
+              <button class="btn btn-secundario btn-inventario-panel" type="button" onclick="abrirHistorial()">Historial de Limpieza</button>
+              <button class="btn btn-secundario btn-inventario-panel" type="button" onclick="abrirInventario()">Inventario</button>
+            </div>
+          </div>
+          <div class="tabla-wrap">
+            <table id="tablaHabitaciones" class="modulo-table">
+              <thead>
+                <tr>
+                  <th>Hab.</th>
+                  <th>Tipo</th>
+                  <th>Piso</th>
+                  <th>Estado</th>
+                  <th>Observaciones</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="panel-footer-actions">
+            <button onclick="actualizarEstados()" class="btn btn-primario">Actualizar estados</button>
+          </div>
+        </div>
+      </section>
 
-<footer>
-Sistema Hotelero - Módulo de Limpieza
-</footer>
-</section>
+      <section id="registro" class="sub-tab-content" style="display:none;">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-titulo">Registro de Limpieza</span>
+          </div>
+          <div class="panel-body">
+            <form id="formRegistro" class="grid-2 form-grid-tight">
+              <div class="form-group">
+                <label for="regAsignacion" class="form-label">Asignaci&oacute;n de limpieza</label>
+                <select class="form-control" id="regAsignacion" required onchange="autocompletarDatosAsignacion()">
+                  <option value="">Seleccione una asignaci&oacute;n</option>
+                </select>
+              </div>
 
-<section id="registro" class="container mt-5" style="display:none;">
-<h2 class="text-center mb-4">Registro de Limpieza</h2>
+              <div class="form-group">
+                <label for="regHabitacion" class="form-label">N&uacute;mero de habitaci&oacute;n</label>
+                <input type="text" class="form-control campo-solo-lectura" id="regHabitacion" readonly required>
+              </div>
 
-<form id="formRegistro" class="border p-3">
-  <div class="form-group">
-    <label for="regAsignacion">Asignación de limpieza</label>
-    <select class="form-control" id="regAsignacion" required onchange="autocompletarDatosAsignacion()">
-      <option value="">Seleccione una asignación</option>
-    </select>
+              <div class="form-group">
+                <label for="regEmpleado" class="form-label">Nombre del empleado</label>
+                <input type="text" class="form-control campo-solo-lectura" id="regEmpleado" readonly required>
+              </div>
+
+              <div class="form-group">
+                <label for="regFecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="regFecha" required>
+              </div>
+
+              <div class="form-group">
+                <label for="regHora" class="form-label">Hora</label>
+                <input type="time" class="form-control" id="regHora" required>
+              </div>
+
+              <div class="form-group">
+                <label for="regEstado" class="form-label">Estado</label>
+                <select class="form-control" id="regEstado" required>
+                  <option value="">Seleccione un estado</option>
+                  <option value="Limpia">Limpia</option>
+                  <option value="Sucia">Sucia</option>
+                  <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+              </div>
+
+              <div class="form-group form-group-full">
+                <label for="regObservaciones" class="form-label">Observaciones</label>
+                <textarea class="form-control" id="regObservaciones"></textarea>
+              </div>
+
+              <div class="form-group form-group-full form-actions-end">
+                <button type="submit" class="btn btn-primario">Registrar limpieza</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalInventario" style="display:none;">
+  <div class="modal-box modal-box-xl inventory-drawer">
+    <div class="modal-header">
+      <span class="modal-titulo">Inventario de Limpieza</span>
+      <button type="button" class="modal-cerrar" onclick="cerrarInventario()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="inventario-resumen">
+        <div class="inventario-card inventario-card-info">
+          <span>Productos registrados</span>
+          <strong id="inv-total-productos">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-warning">
+          <span>Poca cantidad</span>
+          <strong id="inv-stock-bajo">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-ok">
+          <span>Cantidad suficiente</span>
+          <strong id="inv-stock-ok">0</strong>
+        </div>
+      </div>
+
+      <div class="panel inventario-modal-panel">
+        <div class="panel-header">
+          <span class="panel-titulo">Control de Inventario de Limpieza</span>
+          <span class="helper-inline">Actualiza las cantidades disponibles y guarda los cambios.</span>
+        </div>
+        <div class="tabla-wrap">
+          <table id="tablaInventario" class="modulo-table inventario-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Disponible</th>
+                <th>Estado</th>
+                <th>Nueva cantidad</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secundario" onclick="cerrarInventario()">Cerrar</button>
+      <button type="button" class="btn btn-primario" onclick="actualizarInventario()">Actualizar inventario</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalHistorial" style="display:none;">
+  <div class="modal-box modal-box-xl inventory-drawer history-drawer">
+    <div class="modal-header">
+      <span class="modal-titulo">Historial de Limpieza</span>
+      <button type="button" class="modal-cerrar" onclick="cerrarHistorial()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <div class="history-toolbar-wrap">
+          <div class="form-group history-date-group">
+            <label for="historialDesde" class="form-label">Desde</label>
+            <input type="date" class="form-control" id="historialDesde">
+          </div>
+        <div class="form-group history-date-group">
+            <label for="historialHasta" class="form-label">Hasta</label>
+            <input type="date" class="form-control" id="historialHasta">
+          </div>
+          <button type="button" class="btn btn-secundario" onclick="aplicarFiltroHistorial()">Filtrar</button>
+          <button type="button" class="btn btn-primario" onclick="abrirModalFormatoHistorial()">Imprimir</button>
+        </div>
+
+      <div class="history-report-grid">
+        <div class="inventario-card inventario-card-info">
+          <span>Registros en rango</span>
+          <strong id="historialTotal">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-ok">
+          <span>Trabajos cumplidos</span>
+          <strong id="historialCumplidos">0</strong>
+        </div>
+        <div class="inventario-card inventario-card-warning">
+          <span>Pendientes o con incidencia</span>
+          <strong id="historialPendientes">0</strong>
+        </div>
+      </div>
+
+      <div class="panel inventario-modal-panel">
+        <div class="panel-header">
+          <span class="panel-titulo">Movimientos del historial</span>
+          <span class="helper-inline">Incluye fecha de asignaci&oacute;n, empleado responsable y cumplimiento.</span>
+        </div>
+        <div class="panel-body">
+          <div id="timelineHistorial" class="limp-timeline">
+            <div class="limp-empty">
+              <div class="limp-empty-icon">&#128203;</div>
+              Sin historial para mostrar.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secundario" onclick="cerrarHistorial()">Cerrar</button>
+      </div>
+    </div>
   </div>
 
-  <div class="form-group">
-    <label for="regHabitacion">Número de habitación</label>
-    <input type="text" class="form-control campo-solo-lectura" id="regHabitacion" readonly required>
+  <div class="modal-overlay" id="modalFormatoHistorial" style="display:none;">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <span class="modal-titulo">Formato de impresión</span>
+        <button type="button" class="modal-cerrar" onclick="cerrarModalFormatoHistorial()">&times;</button>
+      </div>
+      <div class="modal-body export-format-body">
+        <p class="export-format-texto">Seleccione cómo quiere generar el historial de limpieza.</p>
+        <div class="export-format-grid">
+          <button type="button" class="btn btn-secundario" onclick="exportarHistorial('word')">Word</button>
+          <button type="button" class="btn btn-primario" onclick="exportarHistorial('pdf')">PDF</button>
+          <button type="button" class="btn btn-secundario" onclick="exportarHistorial('json')">JSON</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secundario" onclick="cerrarModalFormatoHistorial()">Cancelar</button>
+      </div>
+    </div>
   </div>
 
-  <div class="form-group">
-    <label for="regEmpleado">Nombre del empleado</label>
-    <input type="text" class="form-control campo-solo-lectura" id="regEmpleado" readonly required>
-  </div>
-
-  <div class="form-group">
-    <label for="regFecha">Fecha</label>
-    <input type="date" class="form-control" id="regFecha" required>
-  </div>
-
-  <div class="form-group">
-    <label for="regHora">Hora</label>
-    <input type="time" class="form-control" id="regHora" required>
-  </div>
-
-  <div class="form-group">
-    <label for="regEstado">Estado</label>
-    <select class="form-control" id="regEstado" required>
-      <option value="">Seleccione un estado</option>
-      <option value="Limpia">Limpia</option>
-      <option value="Sucia">Sucia</option>
-      <option value="Mantenimiento">Mantenimiento</option>
-    </select>
-  </div>
-
-  <div class="form-group">
-    <label for="regObservaciones">Observaciones</label>
-    <textarea class="form-control" id="regObservaciones"></textarea>
-  </div>
-
-  <button type="submit" class="btn btn-success">Registrar limpieza</button>
-</form>
-</section>
-
-<section id="historial" class="container mt-5" style="display:none;">
-<h2>Historial de Limpieza</h2>
-<table id="tablaHistorial" class="table table-bordered table-striped">
-  <thead class="thead-dark">
-    <tr>
-      <th>Habitación</th>
-      <th>Empleado</th>
-      <th>Fecha</th>
-      <th>Hora</th>
-      <th>Estado</th>
-      <th>Observaciones</th>
-      <th>Acción</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-<footer>Sistema Hotelero - Módulo de Limpieza</footer>
-</section>
-
-<script>
-const habitacionesIniciales = [
-  { numero:"101", tipo:"Simple", piso:"1", estado:"Limpia" },
-  { numero:"102", tipo:"Simple", piso:"1", estado:"Sucia" },
-  { numero:"103", tipo:"Simple", piso:"1", estado:"Limpia" },
-  { numero:"104", tipo:"Simple", piso:"1", estado:"Sucia" },
-  { numero:"105", tipo:"Simple", piso:"1", estado:"Limpia" },
-
-  { numero:"201", tipo:"Normal", piso:"2", estado:"Limpia" },
-  { numero:"202", tipo:"Normal", piso:"2", estado:"Sucia" },
-  { numero:"203", tipo:"Normal", piso:"2", estado:"Limpia" },
-  { numero:"204", tipo:"Normal", piso:"2", estado:"Sucia" },
-  { numero:"205", tipo:"Normal", piso:"2", estado:"Mantenimiento" },
-
-  { numero:"301", tipo:"Familiar", piso:"1", estado:"Limpia" },
-  { numero:"302", tipo:"Familiar", piso:"2", estado:"Sucia" },
-  { numero:"303", tipo:"Familiar", piso:"3", estado:"Sucia" },
-  { numero:"304", tipo:"Familiar", piso:"4", estado:"Limpia" },
-  { numero:"305", tipo:"Familiar", piso:"3", estado:"Mantenimiento" },
-
-  { numero:"401", tipo:"Lujosa", piso:"4", estado:"Limpia" },
-  { numero:"402", tipo:"Lujosa", piso:"5", estado:"Sucia" },
-  { numero:"403", tipo:"Lujosa", piso:"6", estado:"Limpia" },
-  { numero:"404", tipo:"Lujosa", piso:"6", estado:"Sucia" },
-  { numero:"405", tipo:"Lujosa", piso:"6", estado:"Mantenimiento" }
-];
-
-const inventarioInicial = [
-  { producto:"Jabón", cantidad:50 },
-  { producto:"Toallas", cantidad:30 },
-  { producto:"Detergente", cantidad:20 },
-  { producto:"Guantes", cantidad:100 },
-  { producto:"Desinfectante", cantidad:15 }
-];
-
-function obtenerHabitaciones() {
-  return JSON.parse(localStorage.getItem("habitaciones")) || habitacionesIniciales;
-}
-
-function guardarHabitaciones(habitaciones) {
-  localStorage.setItem("habitaciones", JSON.stringify(habitaciones));
-}
-
-function obtenerInventario() {
-  return JSON.parse(localStorage.getItem("inventario")) || inventarioInicial;
-}
-
-function guardarInventario(inventario) {
-  localStorage.setItem("inventario", JSON.stringify(inventario));
-}
-
-function obtenerAsignaciones() {
-  return JSON.parse(localStorage.getItem("asignaciones")) || [];
-}
-
-function guardarAsignaciones(asignaciones) {
-  localStorage.setItem("asignaciones", JSON.stringify(asignaciones));
-}
-
-function obtenerRegistros() {
-  return JSON.parse(localStorage.getItem("registros")) || [];
-}
-
-function guardarRegistros(registros) {
-  localStorage.setItem("registros", JSON.stringify(registros));
-}
-
-// Envia datos al PHP
-async function enviarJSON(url, datos) {
-  const respuesta = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(datos)
-  });
-
-  const texto = await respuesta.text();
-  let json = {};
-
-  try {
-    json = texto ? JSON.parse(texto) : {};
-  } catch (error) {
-    throw new Error("La respuesta del servidor no es valida.");
-  }
-
-  if (!respuesta.ok || json.ok === false) {
-    const detalle = json.error ? " Detalle: " + json.error : "";
-    throw new Error((json.mensaje || "No se pudo completar la operacion.") + detalle);
-  }
-
-  return json;
-}
-
-function normalizarAsignacion(asig) {
-  return {
-    id: asig.id,
-    habitacion: asig.habitacion,
-    empleado: asig.empleado,
-    fechaISO: asig.fechaISO,
-    fecha: asig.fecha || formatearFecha(asig.fechaISO),
-    hora24: asig.hora24,
-    hora: asig.hora || formatearHora12(asig.hora24),
-    estado: asig.estado || "Sucia"
-  };
-}
-
-function normalizarRegistro(registro) {
-  return {
-    idRegistro: registro.idRegistro || null,
-    asignacionId: registro.asignacionId,
-    habitacion: registro.habitacion,
-    empleado: registro.empleado,
-    fecha: registro.fecha,
-    fechaMostrada: registro.fechaMostrada || formatearFecha(registro.fecha),
-    hora: registro.hora,
-    horaMostrada: registro.horaMostrada || formatearHora12(registro.hora),
-    estado: registro.estado,
-    observaciones: registro.observaciones || ""
-  };
-}
-
-async function cargarDatosDesdeServidor() {
-  const respuesta = await fetch("php/obtener_datos.php", { cache: "no-store" });
-  const datos = await respuesta.json();
-
-  if (!respuesta.ok || datos.ok === false) {
-    throw new Error(datos.mensaje || "No se pudieron cargar los datos.");
-  }
-
-  return datos;
-}
-
-// Si la base esta vacia, manda lo que haya en localStorage
-async function sincronizarConServidorSiHaceFalta() {
-  const datosServidor = await cargarDatosDesdeServidor();
-  const servidorVacio = datosServidor.habitaciones.length === 0 &&
-                        datosServidor.inventario.length === 0 &&
-                        datosServidor.asignaciones.length === 0 &&
-                        datosServidor.registros.length === 0;
-
-  if (servidorVacio) {
-    await enviarJSON("php/sincronizar_datos.php", {
-      habitaciones: obtenerHabitaciones(),
-      inventario: obtenerInventario(),
-      asignaciones: obtenerAsignaciones(),
-      registros: obtenerRegistros()
-    });
-
-    return await cargarDatosDesdeServidor();
-  }
-
-  return datosServidor;
-}
-
-// Trae lo de MySQL y lo vuelve a guardar localmente
-async function inicializarDesdeServidor() {
-  try {
-    const datos = await sincronizarConServidorSiHaceFalta();
-
-    if (datos.habitaciones.length) {
-      guardarHabitaciones(datos.habitaciones);
-    }
-
-    if (datos.inventario.length) {
-      guardarInventario(datos.inventario);
-    }
-
-    guardarAsignaciones((datos.asignaciones || []).map(normalizarAsignacion));
-    guardarRegistros((datos.registros || []).map(normalizarRegistro));
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-function inicializarDatos() {
-  if (!localStorage.getItem("habitaciones")) {
-    guardarHabitaciones(habitacionesIniciales);
-  }
-
-  if (!localStorage.getItem("inventario")) {
-    guardarInventario(inventarioInicial);
-  }
-
-  if (!localStorage.getItem("registros")) {
-    guardarRegistros([]);
-  }
-}
-
-function formatearFecha(fechaISO) {
-  if (!fechaISO) return "";
-  const partes = fechaISO.split("-");
-  if (partes.length !== 3) return fechaISO;
-
-  const anio = parseInt(partes[0]);
-  const mes = parseInt(partes[1]) - 1;
-  const dia = parseInt(partes[2]);
-
-  const meses = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio",
-    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-  ];
-
-  return `${dia} de ${meses[mes]} de ${anio}`;
-}
-
-function formatearHora12(hora24) {
-  if (!hora24) return "";
-  const partes = hora24.split(":");
-  let horas = parseInt(partes[0]);
-  let minutos = partes[1];
-  let periodo = horas >= 12 ? "PM" : "AM";
-
-  horas = horas % 12;
-  if (horas === 0) horas = 12;
-
-  return `${horas}:${minutos} ${periodo}`;
-}
-
-function obtenerFechaActualISO() {
-  const ahora = new Date();
-  const anio = ahora.getFullYear();
-  const mes = String(ahora.getMonth() + 1).padStart(2, "0");
-  const dia = String(ahora.getDate()).padStart(2, "0");
-  return `${anio}-${mes}-${dia}`;
-}
-
-function obtenerHoraActual24() {
-  const ahora = new Date();
-  const horas = String(ahora.getHours()).padStart(2, "0");
-  const minutos = String(ahora.getMinutes()).padStart(2, "0");
-  return `${horas}:${minutos}`;
-}
-
-function obtenerClaseEstadoTexto(estado) {
-  if (estado === "Limpia") return "limpia";
-  if (estado === "Sucia") return "sucia";
-  if (estado === "Mantenimiento") return "mantenimiento";
-  return "";
-}
-
-function obtenerClaseFilaEstado(estado) {
-  if (estado === "Limpia") return "fila-limpia";
-  if (estado === "Sucia") return "fila-sucia";
-  if (estado === "Mantenimiento") return "fila-mantenimiento";
-  return "";
-}
-
-function obtenerClaseBadge(estado) {
-  if (estado === "Limpia") return "badge badge-success";
-  if (estado === "Sucia") return "badge badge-warning";
-  if (estado === "Mantenimiento") return "badge badge-danger";
-  return "";
-}
-
-function renderHabitaciones() {
-  const habitaciones = obtenerHabitaciones();
-  const tbody = document.querySelector("#tablaHabitaciones tbody");
-  tbody.innerHTML = "";
-
-  habitaciones.forEach((hab, index) => {
-    const fila = document.createElement("tr");
-    fila.className = obtenerClaseFilaEstado(hab.estado);
-
-    fila.innerHTML = `
-      <td>${hab.numero}</td>
-      <td>${hab.tipo}</td>
-      <td>${hab.piso}</td>
-      <td class="${obtenerClaseEstadoTexto(hab.estado)}">${hab.estado}</td>
-      <td>
-        <select data-index="${index}">
-          <option value="Limpia" ${hab.estado === "Limpia" ? "selected" : ""}>Limpia</option>
-          <option value="Sucia" ${hab.estado === "Sucia" ? "selected" : ""}>Sucia</option>
-          <option value="Mantenimiento" ${hab.estado === "Mantenimiento" ? "selected" : ""}>Mantenimiento</option>
+<div class="modal-overlay" id="modalCambioEstado" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-titulo">Cambiar Estado</span>
+      <button type="button" class="modal-cerrar" onclick="cerrarModalEstado()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modalHabitacionIndice">
+      <div class="form-group">
+        <label for="modalHabitacionNumero" class="form-label">Habitaci&oacute;n</label>
+        <input type="text" id="modalHabitacionNumero" class="form-control campo-solo-lectura" readonly>
+      </div>
+      <div class="form-group">
+        <label for="modalHabitacionEstado" class="form-label">Nuevo estado</label>
+        <select id="modalHabitacionEstado" class="form-control">
+          <option value="Limpia">Limpia</option>
+          <option value="Sucia">Sucia</option>
+          <option value="Mantenimiento">Mantenimiento</option>
         </select>
-      </td>
-    `;
+      </div>
+      <div class="form-group">
+        <label for="modalHabitacionObs" class="form-label">Observaciones</label>
+        <textarea id="modalHabitacionObs" class="form-control"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secundario" onclick="cerrarModalEstado()">Cancelar</button>
+      <button type="button" class="btn btn-primario" onclick="guardarCambioEstado()">Guardar</button>
+    </div>
+  </div>
+</div>
 
-    tbody.appendChild(fila);
-  });
-}
-
-// Guarda estados en local y en MySQL
-async function actualizarEstados() {
-  const habitaciones = obtenerHabitaciones();
-  const selects = document.querySelectorAll("#tablaHabitaciones tbody select");
-
-  selects.forEach(select => {
-    const index = parseInt(select.dataset.index);
-    habitaciones[index].estado = select.value;
-  });
-
-  guardarHabitaciones(habitaciones);
-  try {
-    await enviarJSON("php/guardar_habitaciones.php", { habitaciones });
-  } catch (error) {
-    console.error(error);
-  }
-  renderHabitaciones();
-  alert("Estados actualizados correctamente.");
-}
-
-function renderInventario() {
-  const inventario = obtenerInventario();
-  const tbody = document.querySelector("#tablaInventario tbody");
-  tbody.innerHTML = "";
-
-  inventario.forEach((item, index) => {
-    let claseFila = "";
-    if (parseInt(item.cantidad) <= 5) claseFila = "bajo-stock";
-    else if (parseInt(item.cantidad) <= 15) claseFila = "medio-stock";
-    else claseFila = "alto-stock";
-
-    const fila = document.createElement("tr");
-    fila.className = claseFila;
-
-    fila.innerHTML = `
-      <td>${item.producto}</td>
-      <td class="cantidad">${item.cantidad}</td>
-      <td><input type="number" min="0" value="${item.cantidad}" data-index="${index}"></td>
-    `;
-
-    tbody.appendChild(fila);
-  });
-}
-
-// Guarda inventario en local y en MySQL
-async function actualizarInventario() {
-  const inventario = obtenerInventario();
-  const inputs = document.querySelectorAll("#tablaInventario tbody input");
-
-  inputs.forEach(input => {
-    const index = parseInt(input.dataset.index);
-    inventario[index].cantidad = parseInt(input.value) || 0;
-  });
-
-  guardarInventario(inventario);
-  try {
-    await enviarJSON("php/guardar_inventario.php", { inventario });
-  } catch (error) {
-    console.error(error);
-  }
-  renderInventario();
-  alert("Inventario actualizado correctamente.");
-}
-
-function cargarAsignacionesEnRegistro() {
-  const selectAsignacion = document.getElementById("regAsignacion");
-  const asignaciones = obtenerAsignaciones();
-
-  selectAsignacion.innerHTML = `<option value="">Seleccione una asignación</option>`;
-
-  asignaciones
-    .sort((a, b) => {
-      const valorA = (a.fechaISO || "") + " " + (a.hora24 || "");
-      const valorB = (b.fechaISO || "") + " " + (b.hora24 || "");
-      return valorB.localeCompare(valorA);
-    })
-    .forEach(asig => {
-      const option = document.createElement("option");
-      option.value = asig.id;
-      option.textContent = `${asig.habitacion} - ${asig.empleado} - ${asig.fecha} - ${asig.hora}`;
-      selectAsignacion.appendChild(option);
-    });
-}
-
-function autocompletarDatosAsignacion() {
-  const asignacionId = document.getElementById("regAsignacion").value;
-  const asignaciones = obtenerAsignaciones();
-  const asignacion = asignaciones.find(asig => asig.id === asignacionId);
-
-  const inputHabitacion = document.getElementById("regHabitacion");
-  const inputEmpleado = document.getElementById("regEmpleado");
-  const inputFecha = document.getElementById("regFecha");
-  const inputHora = document.getElementById("regHora");
-
-  if (asignacion) {
-    inputHabitacion.value = asignacion.habitacion;
-    inputEmpleado.value = asignacion.empleado;
-    inputFecha.value = obtenerFechaActualISO();
-    inputHora.value = obtenerHoraActual24();
-  } else {
-    inputHabitacion.value = "";
-    inputEmpleado.value = "";
-    inputFecha.value = "";
-    inputHora.value = "";
-  }
-}
-
-function cargarHistorial() {
-  const registros = obtenerRegistros();
-  const tbody = document.querySelector("#tablaHistorial tbody");
-  tbody.innerHTML = "";
-
-  registros.forEach((reg, index) => {
-    const fila = document.createElement("tr");
-
-    fila.innerHTML = `
-      <td>${reg.habitacion}</td>
-      <td>${reg.empleado}</td>
-      <td>${reg.fechaMostrada || reg.fecha}</td>
-      <td>${reg.horaMostrada || reg.hora}</td>
-      <td><span class="${obtenerClaseBadge(reg.estado)}">${reg.estado}</span></td>
-      <td>${reg.observaciones || ""}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="borrarRegistro(${index})">🗑️</button></td>
-    `;
-
-    tbody.appendChild(fila);
-  });
-}
-
-// Borra el registro local y tambien en MySQL si ya existe
-async function borrarRegistro(index) {
-  const registros = obtenerRegistros();
-  const registroEliminado = registros[index];
-  registros.splice(index, 1);
-  guardarRegistros(registros);
-
-  if (registroEliminado && registroEliminado.idRegistro) {
-    try {
-      await enviarJSON("php/eliminar_registro.php", {
-        idRegistro: registroEliminado.idRegistro
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  cargarHistorial();
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-  const formRegistro = document.getElementById("formRegistro");
-
-  formRegistro.addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const asignacionId = document.getElementById("regAsignacion").value;
-    const habitacion = document.getElementById("regHabitacion").value.trim();
-    const empleado = document.getElementById("regEmpleado").value.trim();
-    const fechaISO = document.getElementById("regFecha").value;
-    const hora24 = document.getElementById("regHora").value;
-    const estado = document.getElementById("regEstado").value;
-    const observaciones = document.getElementById("regObservaciones").value.trim();
-    const hoy = new Date().toISOString().split("T")[0];
-
-    if (asignacionId === "") {
-      alert("Debes seleccionar una asignación.");
-      return;
-    }
-
-    if (habitacion === "" || empleado === "") {
-      alert("La asignación seleccionada no es válida.");
-      return;
-    }
-
-    if (fechaISO === "") {
-      alert("Debes seleccionar una fecha.");
-      return;
-    }
-
-    if (hora24 === "") {
-      alert("Debes seleccionar una hora.");
-      return;
-    }
-
-    if (fechaISO > hoy) {
-      alert("La fecha no puede ser futura.");
-      return;
-    }
-
-    const nuevoRegistro = {
-      asignacionId,
-      habitacion,
-      empleado,
-      fecha: fechaISO,
-      fechaMostrada: formatearFecha(fechaISO),
-      hora: hora24,
-      horaMostrada: formatearHora12(hora24),
-      estado,
-      observaciones
-    };
-
-    const registros = obtenerRegistros();
-    registros.unshift(nuevoRegistro);
-    
-    try {
-      const respuesta = await enviarJSON("php/guardar_registro.php", nuevoRegistro);
-      nuevoRegistro.idRegistro = respuesta.idRegistro || null;
-    } catch (error) {
-      console.error(error);
-      // Si falla MySQL, al menos queda guardado local
-      alert("El registro se guardo en el navegador, pero no se pudo guardar en MySQL.");
-    }
-
-    guardarRegistros(registros);
-
-    actualizarEstadoHabitacionSegunRegistro(habitacion, estado);
-    actualizarAsignacionSegunRegistro(asignacionId, estado);
-
-    formRegistro.reset();
-    document.getElementById("regHabitacion").value = "";
-    document.getElementById("regEmpleado").value = "";
-
-    cargarHistorial();
-    cargarAsignacionesEnRegistro();
-    renderHabitaciones();
-    mostrar("registro");
-    alert("Registro guardado correctamente.");
-  });
-});
-
-// Cambia el estado de la habitacion
-function actualizarEstadoHabitacionSegunRegistro(numeroHabitacion, estadoRegistro) {
-  const habitaciones = obtenerHabitaciones();
-  const index = habitaciones.findIndex(h => h.numero === numeroHabitacion);
-
-  if (index !== -1) {
-    habitaciones[index].estado = estadoRegistro;
-    guardarHabitaciones(habitaciones);
-  }
-}
-
-// Cambia el estado de la asignacion
-function actualizarAsignacionSegunRegistro(asignacionId, estadoRegistro) {
-  const asignaciones = obtenerAsignaciones();
-  const index = asignaciones.findIndex(asig => asig.id === asignacionId);
-
-  if (index !== -1) {
-    asignaciones[index].estado = estadoRegistro;
-    guardarAsignaciones(asignaciones);
-  }
-}
-
-function mostrar(seccion) {
-  document.getElementById("habitaciones").style.display = "none";
-  document.getElementById("inventario").style.display = "none";
-  document.getElementById("registro").style.display = "none";
-  document.getElementById("historial").style.display = "none";
-
-  if (seccion === "habitaciones") {
-    document.getElementById("habitaciones").style.display = "block";
-    document.getElementById("inventario").style.display = "block";
-    renderHabitaciones();
-    renderInventario();
-  } else if (seccion === "registro") {
-    document.getElementById("registro").style.display = "block";
-    document.getElementById("historial").style.display = "block";
-    cargarAsignacionesEnRegistro();
-    cargarHistorial();
-  }
-}
-
-// Carga inicial
-window.onload = async function() {
-  inicializarDatos();
-  await inicializarDesdeServidor();
-  renderHabitaciones();
-  renderInventario();
-  cargarHistorial();
-  cargarAsignacionesEnRegistro();
-
-  if (window.location.hash === "#registro") {
-    mostrar("registro");
-  } else {
-    mostrar("habitaciones");
-  }
-};
-</script>
+<script src="assets/js/limpieza/index.js"></script>
 
 </body>
 </html>

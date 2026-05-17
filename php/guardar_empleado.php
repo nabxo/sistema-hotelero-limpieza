@@ -2,55 +2,67 @@
 require_once __DIR__ . "/empleados_schema.php";
 validarMetodoPost();
 
-function generarCodigoEmpleado($conexion)
+function generarCodigoEmpleado(mysqli $conexion, int $id): string
 {
-    $resultado = $conexion->query("SELECT COALESCE(MAX(id), 0) + 1 AS siguiente FROM empleados_limpieza");
-    $siguiente = (int)$resultado->fetch_assoc()["siguiente"];
-    return "EMP-" . str_pad((string)$siguiente, 3, "0", STR_PAD_LEFT);
+    return "EMP-" . str_pad((string)$id, 3, "0", STR_PAD_LEFT);
 }
 
-function guardarFotoEmpleado($codigo, $fotoActual)
+function procesarFotoEmpleado(?array $archivo, string $codigoEmpleado, ?string $fotoActual = null): ?string
 {
-    if (!isset($_FILES["foto"]) || $_FILES["foto"]["error"] !== UPLOAD_ERR_OK) {
+    if (!$archivo || ($archivo["error"] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return $fotoActual;
     }
 
-    $tamanoMaximo = 5 * 1024 * 1024;
-    if (($_FILES["foto"]["size"] ?? 0) > $tamanoMaximo) {
-        responderJson(["ok" => false, "mensaje" => "La foto no puede superar los 5 MB"], 400);
+    if (($archivo["error"] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        throw new RuntimeException("No se pudo subir la foto del empleado.");
     }
 
-    $permitidos = [
-        "image/jpeg" => "jpg",
-        "image/png" => "png",
-        "image/webp" => "webp"
+    if (($archivo["size"] ?? 0) > 5 * 1024 * 1024) {
+        throw new RuntimeException("La foto supera el limite permitido de 5 MB.");
+    }
+
+    $tmp = $archivo["tmp_name"] ?? "";
+    $nombreOriginal = $archivo["name"] ?? "";
+    $extension = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+    $permitidas = ["jpg", "jpeg", "png", "webp"];
+
+    if (!in_array($extension, $permitidas, true)) {
+        throw new RuntimeException("La foto debe ser JPG, PNG o WEBP.");
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($tmp);
+    $mimesPermitidos = [
+        "jpg" => "image/jpeg",
+        "jpeg" => "image/jpeg",
+        "png" => "image/png",
+        "webp" => "image/webp"
     ];
 
-    $tipo = mime_content_type($_FILES["foto"]["tmp_name"]);
-    if (!isset($permitidos[$tipo])) {
-        responderJson(["ok" => false, "mensaje" => "La foto debe ser JPG, PNG o WEBP"], 400);
+    if (($mimesPermitidos[$extension] ?? "") !== $mime) {
+        throw new RuntimeException("El archivo de la foto no es valido.");
     }
 
-    $carpeta = dirname(__DIR__) . DIRECTORY_SEPARATOR . "imagenes_empleados";
-    if (!is_dir($carpeta)) {
-        mkdir($carpeta, 0775, true);
+    $directorio = dirname(__DIR__) . "/imagenes_empleados";
+    if (!is_dir($directorio)) {
+        mkdir($directorio, 0777, true);
     }
 
-    $archivo = strtolower($codigo) . "." . $permitidos[$tipo];
-    $destino = $carpeta . DIRECTORY_SEPARATOR . $archivo;
+    $nombreFinal = strtolower($codigoEmpleado) . "-" . time() . "." . $extension;
+    $rutaDestino = $directorio . "/" . $nombreFinal;
 
-    if (!move_uploaded_file($_FILES["foto"]["tmp_name"], $destino)) {
-        responderJson(["ok" => false, "mensaje" => "No se pudo guardar la foto"], 500);
+    if (!move_uploaded_file($tmp, $rutaDestino)) {
+        throw new RuntimeException("No se pudo guardar la foto del empleado.");
     }
 
-    return "imagenes_empleados/" . $archivo;
+    return "imagenes_empleados/" . $nombreFinal;
 }
 
 try {
     $conexion = obtenerConexion();
     asegurarEstructuraEmpleados($conexion);
 
-    $id = (int)($_POST["id"] ?? 0);
+    $id = (int)($_POST["empleadoId"] ?? 0);
     $nombre = texto($_POST["nombre"] ?? "");
     $apellido = texto($_POST["apellido"] ?? "");
     $telefono = texto($_POST["telefono"] ?? "");
@@ -62,63 +74,81 @@ try {
     $notasInternas = texto($_POST["notasInternas"] ?? "");
     $puesto = "Auxiliar de Limpieza";
 
-    if ($nombre === "" || $apellido === "" || $telefono === "" || $direccion === "" || $fechaIngreso === "" || $estadoLaboral === "") {
-        responderJson(["ok" => false, "mensaje" => "Completa los datos obligatorios del empleado"], 400);
+    if ($nombre === "" || $apellido === "" || $telefono === "" || $direccion === "" || $fechaIngreso === "") {
+        responderJson(["ok" => false, "mensaje" => "Completa todos los datos obligatorios del empleado."], 400);
     }
 
     if (!in_array($estadoLaboral, ["Activo", "Inactivo", "Vacaciones"], true)) {
-        responderJson(["ok" => false, "mensaje" => "Estado laboral no valido"], 400);
+        responderJson(["ok" => false, "mensaje" => "Selecciona un estado laboral valido."], 400);
     }
 
-    if ($estadoLaboral === "Inactivo") {
-        if ($fechaSalida === "" || $motivoSalida === "") {
-            responderJson(["ok" => false, "mensaje" => "Completa la fecha y el motivo de salida para dar de baja al empleado"], 400);
-        }
-    } else {
-        $fechaSalida = null;
-        $motivoSalida = null;
+    if ($estadoLaboral === "Inactivo" && ($fechaSalida === "" || $motivoSalida === "")) {
+        responderJson(["ok" => false, "mensaje" => "Completa la fecha y el motivo de salida para dar de baja al empleado."], 400);
     }
+
+    if ($estadoLaboral !== "Inactivo") {
+        $fechaSalida = "";
+        $motivoSalida = "";
+    }
+
+    $conexion->begin_transaction();
+
+    $fotoActual = null;
+    $codigoEmpleado = "";
 
     if ($id > 0) {
         $stmtActual = $conexion->prepare("SELECT codigo_empleado, foto FROM empleados_limpieza WHERE id = ?");
         $stmtActual->bind_param("i", $id);
         $stmtActual->execute();
         $actual = $stmtActual->get_result()->fetch_assoc();
+
         if (!$actual) {
-            responderJson(["ok" => false, "mensaje" => "Empleado no encontrado"], 404);
+            responderJson(["ok" => false, "mensaje" => "El empleado que intentas editar no existe."], 404);
         }
 
-        $codigo = $actual["codigo_empleado"];
-        $foto = guardarFotoEmpleado($codigo, $actual["foto"]);
-
-        $sql = "UPDATE empleados_limpieza
-                SET nombre = ?, apellido = ?, telefono = ?, direccion = ?, fecha_ingreso = ?,
-                    puesto = ?, estado_laboral = ?, fecha_salida = ?, motivo_salida = ?, notas_internas = ?, foto = ?
-                WHERE id = ?";
-        $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("sssssssssssi", $nombre, $apellido, $telefono, $direccion, $fechaIngreso, $puesto, $estadoLaboral, $fechaSalida, $motivoSalida, $notasInternas, $foto, $id);
-        $stmt->execute();
+        $codigoEmpleado = $actual["codigo_empleado"];
+        $fotoActual = $actual["foto"];
     } else {
-        $codigo = generarCodigoEmpleado($conexion);
-        $foto = guardarFotoEmpleado($codigo, "");
+        $stmtInsert = $conexion->prepare("
+            INSERT INTO empleados_limpieza
+            (codigo_empleado, nombre, apellido, telefono, direccion, fecha_ingreso, puesto, estado_laboral, fecha_salida, motivo_salida, notas_internas, foto)
+            VALUES ('TEMP', ?, ?, ?, ?, ?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), ?, NULL)
+        ");
+        $stmtInsert->bind_param("ssssssssss", $nombre, $apellido, $telefono, $direccion, $fechaIngreso, $puesto, $estadoLaboral, $fechaSalida, $motivoSalida, $notasInternas);
+        $stmtInsert->execute();
+        $id = (int)$stmtInsert->insert_id;
+        $codigoEmpleado = generarCodigoEmpleado($conexion, $id);
 
-        $sql = "INSERT INTO empleados_limpieza
-                (codigo_empleado, nombre, apellido, telefono, direccion, fecha_ingreso, puesto, estado_laboral, fecha_salida, motivo_salida, notas_internas, foto)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("ssssssssssss", $codigo, $nombre, $apellido, $telefono, $direccion, $fechaIngreso, $puesto, $estadoLaboral, $fechaSalida, $motivoSalida, $notasInternas, $foto);
-        $stmt->execute();
-        $id = $stmt->insert_id;
+        $stmtCodigo = $conexion->prepare("UPDATE empleados_limpieza SET codigo_empleado = ? WHERE id = ?");
+        $stmtCodigo->bind_param("si", $codigoEmpleado, $id);
+        $stmtCodigo->execute();
     }
 
+    $foto = procesarFotoEmpleado($_FILES["foto"] ?? null, $codigoEmpleado, $fotoActual);
+
+    $stmtGuardar = $conexion->prepare("
+        UPDATE empleados_limpieza
+        SET nombre = ?, apellido = ?, telefono = ?, direccion = ?, fecha_ingreso = ?, puesto = ?, estado_laboral = ?,
+            fecha_salida = NULLIF(?, ''), motivo_salida = NULLIF(?, ''), notas_internas = ?, foto = ?
+        WHERE id = ?
+    ");
+    $stmtGuardar->bind_param("sssssssssssi", $nombre, $apellido, $telefono, $direccion, $fechaIngreso, $puesto, $estadoLaboral, $fechaSalida, $motivoSalida, $notasInternas, $foto, $id);
+    $stmtGuardar->execute();
+
+    $conexion->commit();
     intentarSincronizarMongoDesdeMySQL($conexion);
+
     responderJson([
         "ok" => true,
-        "mensaje" => "Empleado guardado",
+        "mensaje" => "Empleado guardado correctamente.",
         "id" => $id,
-        "codigo" => $codigo
+        "codigo" => $codigoEmpleado,
+        "foto" => $foto
     ]);
 } catch (Throwable $e) {
+    if (isset($conexion)) {
+        $conexion->rollback();
+    }
     manejarErrorServidor("No se pudo guardar el empleado", $e);
 }
-?>
+

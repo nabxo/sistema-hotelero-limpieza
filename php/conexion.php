@@ -5,7 +5,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 function obtenerConexion()
 {
-    $servidor = "localhost";
+    $servidor = "127.0.0.1";
     $usuario = "root";
     $contrasena = "";
     $base_datos = "sistema-hotelero-limpieza";

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/funciones.php";
+require_once __DIR__ . "/empleados_schema.php";
 validarMetodoPost();
 
 try {
@@ -12,6 +12,7 @@ try {
     $registros = $datos["registros"] ?? [];
 
     $conexion = obtenerConexion();
+    asegurarEstructuraEmpleados($conexion);
     $conexion->begin_transaction();
 
     // Solo copia si la base esta vacia
@@ -54,10 +55,11 @@ try {
 
     // Copia asignaciones
     if ($tablasVacias["asignaciones"] && !empty($asignaciones)) {
-        $stmt = $conexion->prepare("INSERT INTO asignaciones_limpieza (codigo_asignacion, habitacion, empleado, fecha_asignacion, hora_asignacion, estado) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $conexion->prepare("INSERT INTO asignaciones_limpieza (codigo_asignacion, habitacion, empleado_id, empleado, fecha_asignacion, hora_asignacion, estado) VALUES (?, ?, ?, ?, ?, ?, ?)");
         foreach ($asignaciones as $asignacion) {
             $codigo = texto($asignacion["id"] ?? "");
             $habitacion = texto($asignacion["habitacion"] ?? "");
+            $empleadoId = (int)($asignacion["empleadoId"] ?? 0);
             $empleado = texto($asignacion["empleado"] ?? "");
             $fecha = texto($asignacion["fechaISO"] ?? "");
             $hora = texto($asignacion["hora24"] ?? "");
@@ -65,17 +67,19 @@ try {
             if ($codigo === "" || $habitacion === "" || $empleado === "" || $fecha === "" || $hora === "") {
                 continue;
             }
-            $stmt->bind_param("ssssss", $codigo, $habitacion, $empleado, $fecha, $hora, $estado);
+            $empleadoIdParam = $empleadoId > 0 ? $empleadoId : null;
+            $stmt->bind_param("ssissss", $codigo, $habitacion, $empleadoIdParam, $empleado, $fecha, $hora, $estado);
             $stmt->execute();
         }
     }
 
     // Copia registros
     if ($tablasVacias["registros"] && !empty($registros)) {
-        $stmt = $conexion->prepare("INSERT INTO registros_limpieza (codigo_asignacion, habitacion, empleado, fecha_registro, hora_registro, estado, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conexion->prepare("INSERT INTO registros_limpieza (codigo_asignacion, habitacion, empleado_id, empleado, fecha_registro, hora_registro, estado, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         foreach ($registros as $registro) {
             $codigoAsignacion = texto($registro["asignacionId"] ?? "");
             $habitacion = texto($registro["habitacion"] ?? "");
+            $empleadoId = (int)($registro["empleadoId"] ?? 0);
             $empleado = texto($registro["empleado"] ?? "");
             $fecha = texto($registro["fecha"] ?? "");
             $hora = texto($registro["hora"] ?? "");
@@ -84,21 +88,19 @@ try {
             if ($codigoAsignacion === "" || $habitacion === "" || $empleado === "" || $fecha === "" || $hora === "" || $estado === "") {
                 continue;
             }
-            $stmt->bind_param("sssssss", $codigoAsignacion, $habitacion, $empleado, $fecha, $hora, $estado, $observaciones);
+            $empleadoIdParam = $empleadoId > 0 ? $empleadoId : null;
+            $stmt->bind_param("ssisssss", $codigoAsignacion, $habitacion, $empleadoIdParam, $empleado, $fecha, $hora, $estado, $observaciones);
             $stmt->execute();
         }
     }
 
     $conexion->commit();
+    intentarSincronizarMongoDesdeMySQL($conexion);
     responderJson(["ok" => true, "mensaje" => "Sincronizacion inicial completada"]);
 } catch (Throwable $e) {
     if (isset($conexion)) {
         $conexion->rollback();
     }
-    responderJson([
-        "ok" => false,
-        "mensaje" => "No se pudo sincronizar la informacion inicial",
-        "error" => $e->getMessage()
-    ], 500);
+    manejarErrorServidor("No se pudo sincronizar la informacion inicial", $e);
 }
 ?>
