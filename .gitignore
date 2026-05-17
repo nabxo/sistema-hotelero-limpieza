@@ -1,0 +1,9 @@
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.zip
+Thumbs.db
+Desktop.ini
